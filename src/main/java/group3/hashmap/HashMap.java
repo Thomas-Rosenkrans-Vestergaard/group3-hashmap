@@ -221,14 +221,14 @@ public class HashMap<K, V> implements Map<K, V>
 		int         bucketIndex = hashCode % capacity;
 		Entry<K, V> current     = buckets.get(bucketIndex);
 
-		while (true) {
-			if (current == null)
-				return false;
+		while (current != null) {
 			if (current.hash == hashCode && current.key.equals(key))
 				return true;
 
 			current = current.next;
 		}
+
+		return false;
 	}
 
 	/**
@@ -246,9 +246,7 @@ public class HashMap<K, V> implements Map<K, V>
 	{
 		for (Entry<K, V> head : buckets) {
 			Entry<K, V> current = head;
-			while (true) {
-				if (current == null)
-					break;
+			while (current != null) {
 				if (current.value.equals(value))
 					return true;
 
@@ -386,11 +384,7 @@ public class HashMap<K, V> implements Map<K, V>
 		Entry<K, V> previous = null;
 		Entry<K, V> current  = head;
 
-		while (true) {
-
-			if (current == null) {
-				return null;
-			}
+		while (current != null) {
 
 			if (current.key.equals(key)) {
 				V before = current.getValue();
@@ -405,6 +399,8 @@ public class HashMap<K, V> implements Map<K, V>
 			previous = current;
 			current = current.next;
 		}
+
+		return null;
 	}
 
 	/**
