@@ -130,9 +130,9 @@ public class HashMap<K, V> implements Map<K, V>
 		 * @param value The value in the key-value pair.
 		 * @param next  The next entry in this bucket.
 		 */
-		public Entry(K key, V value, Entry next)
+		public Entry(int hash, K key, V value, Entry next)
 		{
-			this.hash = key.hashCode();
+			this.hash = hash;
 			this.key = key;
 			this.value = value;
 			this.next = next;
@@ -162,7 +162,6 @@ public class HashMap<K, V> implements Map<K, V>
 		 * Sets the value in the key-value pair.
 		 *
 		 * @param value The new value to set.
-		 *
 		 * @return The value just replaced.
 		 */
 		public V setValue(V value)
@@ -211,13 +210,16 @@ public class HashMap<K, V> implements Map<K, V>
 	 * at most one such mapping.)
 	 *
 	 * @param key key whose presence in this map is to be tested
-	 *
 	 * @return <tt>true</tt> if this map contains a mapping for the specified
 	 * key
+	 * @throws NullPointerException When the key is <code>null</code>.
 	 */
 	@Override public boolean containsKey(Object key)
 	{
-		int         hashCode    = key.hashCode();
+		if (key == null)
+			throw new NullPointerException("Keys cannot be null.");
+
+		int         hashCode    = hash(key);
 		int         bucketIndex = hashCode % capacity;
 		Entry<K, V> current     = buckets.get(bucketIndex);
 
@@ -238,7 +240,6 @@ public class HashMap<K, V> implements Map<K, V>
 	 * <tt>(value==null ? v==null : value.equals(v))</tt>.
 	 *
 	 * @param value value whose presence in this map is to be tested
-	 *
 	 * @return <tt>true</tt> if this map maps one or more keys to the
 	 * specified value
 	 */
@@ -273,13 +274,16 @@ public class HashMap<K, V> implements Map<K, V>
 	 * containsKey} operation may be used to distinguish these two cases.
 	 *
 	 * @param key the key whose associated value is to be returned
-	 *
 	 * @return the value to which the specified key is mapped, or
 	 * {@code null} if this map contains no mapping for the key
+	 * @throws NullPointerException When the provided key is <code>null</code>.
 	 */
 	@Override public V get(Object key)
 	{
-		int         hashCode    = key.hashCode();
+		if (key == null)
+			throw new NullPointerException("Key cannot be null");
+
+		int         hashCode    = hash(key);
 		int         bucketIndex = hashCode % capacity;
 		Entry<K, V> current     = buckets.get(bucketIndex);
 
@@ -304,21 +308,24 @@ public class HashMap<K, V> implements Map<K, V>
 	 *
 	 * @param key   key with which the specified value is to be associated
 	 * @param value value to be associated with the specified key
-	 *
 	 * @return the previous value associated with <tt>key</tt>, or
 	 * <tt>null</tt> if there was no mapping for <tt>key</tt>.
 	 * (A <tt>null</tt> return can also indicate that the map
 	 * previously associated <tt>null</tt> with <tt>key</tt>,
 	 * if the implementation supports <tt>null</tt> values.)
+	 * @throws NullPointerException When the provided key is <code>null</code>.
 	 */
 	@Override public V put(K key, V value)
 	{
-		int         hashCode    = key.hashCode();
+		if (key == null)
+			throw new NullPointerException("Keys cannot be null");
+
+		int         hashCode    = hash(key);
 		int         bucketIndex = hashCode % capacity;
 		Entry<K, V> head        = buckets.get(bucketIndex);
 
 		if (head == null) {
-			buckets.set(bucketIndex, new Entry<>(key, value, null));
+			buckets.set(bucketIndex, new Entry<>(hashCode, key, value, null));
 			entryCount++;
 			if (needsExpansion())
 				expand();
@@ -337,7 +344,7 @@ public class HashMap<K, V> implements Map<K, V>
 		while (true) {
 
 			if (current == null) {
-				previous.setNext(new Entry<>(key, value, previous));
+				previous.setNext(new Entry<>(hashCode, key, value, previous));
 				entryCount++;
 				return null;
 			}
@@ -371,13 +378,16 @@ public class HashMap<K, V> implements Map<K, V>
 	 * call returns.
 	 *
 	 * @param key key whose mapping is to be removed from the map
-	 *
 	 * @return the previous value associated with <tt>key</tt>, or
 	 * <tt>null</tt> if there was no mapping for <tt>key</tt>.
+	 * @throws NullPointerException When the provided key is <code>null</code>.
 	 */
 	@Override public V remove(Object key)
 	{
-		int         hashCode    = key.hashCode();
+		if (key == null)
+			throw new NullPointerException("Keys cannot be null");
+
+		int         hashCode    = hash(key);
 		int         bucketIndex = hashCode % capacity;
 		Entry<K, V> head        = buckets.get(bucketIndex);
 
@@ -412,7 +422,6 @@ public class HashMap<K, V> implements Map<K, V>
 	 * specified map is modified while the operation is in progress.
 	 *
 	 * @param m mappings to be stored in this map
-	 *
 	 * @throws NullPointerException if the specified map is null
 	 */
 	@Override public void putAll(Map<? extends K, ? extends V> m)
@@ -476,7 +485,6 @@ public class HashMap<K, V> implements Map<K, V>
 	 *
 	 * @param entries The number of entries to use, when checking whether or not the {@link HashMap} needs to be
 	 *                expanded.
-	 *
 	 * @return Whether or not the {@link HashMap} needs an expansion.
 	 */
 	private boolean needsExpansion(int entries)
@@ -557,6 +565,18 @@ public class HashMap<K, V> implements Map<K, V>
 	public double getLoadFactor()
 	{
 		return this.loadFactor;
+	}
+
+	/**
+	 * Hashes the provided object, returning either 0 for null values, or the
+	 * result of hashCode.
+	 *
+	 * @param object The object to hash.
+	 * @return The hash result.
+	 */
+	private int hash(Object object)
+	{
+		return object == null ? 0 : Math.abs(object.hashCode() % capacity);
 	}
 
 	/**

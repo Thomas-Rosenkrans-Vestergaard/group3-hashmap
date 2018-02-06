@@ -46,6 +46,12 @@ public class HashMapTest
 		assertTrue(hashMap.containsKey(0));
 	}
 
+	@Test(expected = NullPointerException.class)
+	public void containsKeyThrowsNullPointerException() throws Exception
+	{
+		hashMap.containsKey(null);
+	}
+
 	@Test
 	public void containsValue() throws Exception
 	{
@@ -59,10 +65,15 @@ public class HashMapTest
 	@Test
 	public void get() throws Exception
 	{
-		HashMap<Integer, Integer> hashMap = new HashMap<>();
 		assertNull(hashMap.get(0));
 		hashMap.put(0, 15);
 		assertEquals(15, (long) hashMap.get(0));
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void getThrowsNullPointerException() throws Exception
+	{
+		hashMap.get(null);
 	}
 
 	@Test
@@ -73,6 +84,12 @@ public class HashMapTest
 		assertEquals(156, (long) hashMap.put(0, 200));
 	}
 
+	@Test(expected = NullPointerException.class)
+	public void putThrowsNullPointerException() throws Exception
+	{
+		hashMap.put(null, 1);
+	}
+
 	@Test
 	public void remove() throws Exception
 	{
@@ -80,6 +97,12 @@ public class HashMapTest
 		assertFalse(hashMap.isEmpty());
 		assertEquals(250, (long) hashMap.remove(0));
 		assertTrue(hashMap.isEmpty());
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void removeThrowsNullPointerException() throws Exception
+	{
+		hashMap.remove(null);
 	}
 
 	@Test
