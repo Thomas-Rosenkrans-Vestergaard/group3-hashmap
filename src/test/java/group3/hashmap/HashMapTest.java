@@ -170,4 +170,24 @@ public class HashMapTest
 		hashMap = new HashMap<>(0.1);
 		assertEquals(0.1, hashMap.getLoadFactor(), 0.0001);
 	}
+
+	@Test
+	public void canHandleCollisions()
+	{
+		hashMap = new HashMap<>(10);
+
+		hashMap.put(7, 1);
+		hashMap.put(17, 2);
+		hashMap.put(27, 3);
+		hashMap.put(37, 4);
+		hashMap.put(47, 5);
+
+		assertEquals(1, (long) hashMap.get(7));
+		assertEquals(2, (long) hashMap.get(17));
+		assertEquals(3, (long) hashMap.get(27));
+		assertEquals(4, (long) hashMap.get(37));
+		assertEquals(5, (long) hashMap.get(47));
+
+		assertEquals(5, hashMap.size());
+	}
 }

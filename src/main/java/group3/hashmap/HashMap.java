@@ -219,8 +219,8 @@ public class HashMap<K, V> implements Map<K, V>
 		if (key == null)
 			throw new NullPointerException("Keys cannot be null.");
 
-		int         hashCode    = hash(key);
-		int         bucketIndex = hashCode % capacity;
+		int         hashCode    = key.hashCode();
+		int         bucketIndex = Math.abs(hashCode) % capacity;
 		Entry<K, V> current     = buckets.get(bucketIndex);
 
 		while (current != null) {
@@ -283,8 +283,8 @@ public class HashMap<K, V> implements Map<K, V>
 		if (key == null)
 			throw new NullPointerException("Key cannot be null");
 
-		int         hashCode    = hash(key);
-		int         bucketIndex = hashCode % capacity;
+		int         hashCode    = key.hashCode();
+		int         bucketIndex = Math.abs(hashCode) % capacity;
 		Entry<K, V> current     = buckets.get(bucketIndex);
 
 		while (current != null) {
@@ -320,8 +320,8 @@ public class HashMap<K, V> implements Map<K, V>
 		if (key == null)
 			throw new NullPointerException("Keys cannot be null");
 
-		int         hashCode    = hash(key);
-		int         bucketIndex = hashCode % capacity;
+		int         hashCode    = key.hashCode();
+		int         bucketIndex = Math.abs(hashCode) % capacity;
 		Entry<K, V> head        = buckets.get(bucketIndex);
 
 		if (head == null) {
@@ -344,7 +344,7 @@ public class HashMap<K, V> implements Map<K, V>
 		while (true) {
 
 			if (current == null) {
-				previous.setNext(new Entry<>(hashCode, key, value, previous));
+				previous.setNext(new Entry<>(hashCode, key, value, null));
 				entryCount++;
 				return null;
 			}
@@ -352,6 +352,12 @@ public class HashMap<K, V> implements Map<K, V>
 			if (current.key.equals(key)) {
 				current.setValue(value);
 				return current.value;
+			}
+
+			if (current.next == null) {
+				current.setNext(new Entry<>(hashCode, key, value, null));
+				entryCount++;
+				return null;
 			}
 
 			previous = current;
@@ -387,8 +393,8 @@ public class HashMap<K, V> implements Map<K, V>
 		if (key == null)
 			throw new NullPointerException("Keys cannot be null");
 
-		int         hashCode    = hash(key);
-		int         bucketIndex = hashCode % capacity;
+		int         hashCode    = key.hashCode();
+		int         bucketIndex = Math.abs(hashCode) % capacity;
 		Entry<K, V> head        = buckets.get(bucketIndex);
 
 		Entry<K, V> previous = null;
@@ -565,18 +571,6 @@ public class HashMap<K, V> implements Map<K, V>
 	public double getLoadFactor()
 	{
 		return this.loadFactor;
-	}
-
-	/**
-	 * Hashes the provided object, returning either 0 for null values, or the
-	 * result of hashCode.
-	 *
-	 * @param object The object to hash.
-	 * @return The hash result.
-	 */
-	private int hash(Object object)
-	{
-		return object == null ? 0 : Math.abs(object.hashCode() % capacity);
 	}
 
 	/**
