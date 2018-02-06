@@ -288,7 +288,7 @@ public class HashMap<K, V> implements Map<K, V>
 		Entry<K, V> current     = buckets.get(bucketIndex);
 
 		while (current != null) {
-			if (current.key.equals(key)) {
+			if (current.hash == hashCode && current.key.equals(key)) {
 				return current.getValue();
 			}
 
@@ -332,7 +332,7 @@ public class HashMap<K, V> implements Map<K, V>
 			return null;
 		}
 
-		if (head.key.equals(key)) {
+		if (head.hash == hashCode && head.key.equals(key)) {
 			V before = head.getValue();
 			head.setValue(value);
 			return before;
@@ -349,7 +349,7 @@ public class HashMap<K, V> implements Map<K, V>
 				return null;
 			}
 
-			if (current.key.equals(key)) {
+			if (current.hash == hashCode && current.key.equals(key)) {
 				current.setValue(value);
 				return current.value;
 			}
@@ -402,7 +402,7 @@ public class HashMap<K, V> implements Map<K, V>
 
 		while (current != null) {
 
-			if (current.key.equals(key)) {
+			if (current.hash == hashCode && current.key.equals(key)) {
 				V before = current.getValue();
 				if (previous != null)
 					previous.setNext(current.next);
