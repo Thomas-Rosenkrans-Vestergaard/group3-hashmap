@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Collection;
+import java.util.HashMap;
 
 import static org.junit.Assert.*;
 
@@ -29,6 +30,7 @@ public class HashMapTest
 		hashMap.put(1, 0);
 		assertEquals(2, hashMap.size());
 	}
+
 
 	@Test
 	public void isEmpty() throws Exception

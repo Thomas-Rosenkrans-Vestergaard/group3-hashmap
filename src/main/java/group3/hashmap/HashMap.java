@@ -356,11 +356,13 @@ public class HashMap<K, V> implements Map<K, V>
                 return current.value;
             }
 
-            if (current.next == null) {
-                current.setNext(new Entry<>(hashCode, key, value, null));
-                entryCount++;
-                return null;
-            }
+            //if (current.next == null) {
+                //current.setNext(new Entry<>(hashCode, key, value, null));
+                //entryCount++;
+                //if (needsExpansion())
+                    //expand();
+                //return null;
+            //}
 
             previous = current;
             current = current.next;
