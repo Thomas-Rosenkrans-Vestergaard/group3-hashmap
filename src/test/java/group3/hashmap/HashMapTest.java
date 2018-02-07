@@ -191,4 +191,14 @@ public class HashMapTest
 
 		assertEquals(5, hashMap.size());
 	}
+
+	@Test
+	public void canExpand() {
+	    hashMap = new HashMap<>(4);
+	    assertEquals(4, hashMap.getCapacity());
+	    hashMap.put(1, 1);
+        hashMap.put(2, 1);
+        hashMap.put(3, 1);
+        assertEquals(8, hashMap.getCapacity());
+    }
 }
