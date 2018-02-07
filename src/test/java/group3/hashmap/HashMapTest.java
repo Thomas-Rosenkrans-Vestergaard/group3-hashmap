@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Collection;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -80,7 +81,9 @@ public class HashMapTest
 	@Test
 	public void put() throws Exception
 	{
+		assertFalse(hashMap.containsKey(0));
 		hashMap.put(0, 156);
+		assertTrue(hashMap.containsKey(0));
 		assertEquals(156, (long) hashMap.get(0));
 		assertEquals(156, (long) hashMap.put(0, 200));
 	}
@@ -173,7 +176,7 @@ public class HashMapTest
 	}
 
 	@Test
-	public void canHandleCollisions()
+	public void canHandleCollisions() throws Exception
 	{
 		hashMap = new HashMap<>(10);
 
@@ -193,12 +196,25 @@ public class HashMapTest
 	}
 
 	@Test
-	public void canExpand() {
-	    hashMap = new HashMap<>(4);
-	    assertEquals(4, hashMap.getCapacity());
-	    hashMap.put(1, 1);
-        hashMap.put(2, 1);
-        hashMap.put(3, 1);
-        assertEquals(8, hashMap.getCapacity());
-    }
+	public void canExpand() throws Exception
+	{
+		hashMap = new HashMap<>(4);
+		assertEquals(4, hashMap.getCapacity());
+		hashMap.put(1, 1);
+		hashMap.put(2, 1);
+		hashMap.put(3, 1);
+		assertEquals(8, hashMap.getCapacity());
+	}
+
+	@Test
+	public void entrySet() throws Exception
+	{
+		hashMap.put(0, 0);
+		hashMap.put(1, 1);
+		hashMap.put(2, 2);
+
+		Set<java.util.Map.Entry<Integer, Integer>> entrySet = hashMap.entrySet();
+		entrySet.add(new HashMap.Entry<>(3, 3));
+		assertEquals(4, entrySet.size());
+	}
 }
