@@ -30,6 +30,7 @@ public class HashMapTest
 		assertEquals(2, hashMap.size());
 	}
 
+
 	@Test
 	public void isEmpty() throws Exception
 	{
@@ -46,6 +47,12 @@ public class HashMapTest
 		assertTrue(hashMap.containsKey(0));
 	}
 
+	@Test(expected = NullPointerException.class)
+	public void containsKeyThrowsNullPointerException() throws Exception
+	{
+		hashMap.containsKey(null);
+	}
+
 	@Test
 	public void containsValue() throws Exception
 	{
@@ -59,10 +66,15 @@ public class HashMapTest
 	@Test
 	public void get() throws Exception
 	{
-		HashMap<Integer, Integer> hashMap = new HashMap<>();
 		assertNull(hashMap.get(0));
 		hashMap.put(0, 15);
 		assertEquals(15, (long) hashMap.get(0));
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void getThrowsNullPointerException() throws Exception
+	{
+		hashMap.get(null);
 	}
 
 	@Test
@@ -73,6 +85,12 @@ public class HashMapTest
 		assertEquals(156, (long) hashMap.put(0, 200));
 	}
 
+	@Test(expected = NullPointerException.class)
+	public void putThrowsNullPointerException() throws Exception
+	{
+		hashMap.put(null, 1);
+	}
+
 	@Test
 	public void remove() throws Exception
 	{
@@ -80,6 +98,12 @@ public class HashMapTest
 		assertFalse(hashMap.isEmpty());
 		assertEquals(250, (long) hashMap.remove(0));
 		assertTrue(hashMap.isEmpty());
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void removeThrowsNullPointerException() throws Exception
+	{
+		hashMap.remove(null);
 	}
 
 	@Test
@@ -147,4 +171,34 @@ public class HashMapTest
 		hashMap = new HashMap<>(0.1);
 		assertEquals(0.1, hashMap.getLoadFactor(), 0.0001);
 	}
+
+	@Test
+	public void canHandleCollisions()
+	{
+		hashMap = new HashMap<>(10);
+
+		hashMap.put(7, 1);
+		hashMap.put(17, 2);
+		hashMap.put(27, 3);
+		hashMap.put(37, 4);
+		hashMap.put(47, 5);
+
+		assertEquals(1, (long) hashMap.get(7));
+		assertEquals(2, (long) hashMap.get(17));
+		assertEquals(3, (long) hashMap.get(27));
+		assertEquals(4, (long) hashMap.get(37));
+		assertEquals(5, (long) hashMap.get(47));
+
+		assertEquals(5, hashMap.size());
+	}
+
+	@Test
+	public void canExpand() {
+	    hashMap = new HashMap<>(4);
+	    assertEquals(4, hashMap.getCapacity());
+	    hashMap.put(1, 1);
+        hashMap.put(2, 1);
+        hashMap.put(3, 1);
+        assertEquals(8, hashMap.getCapacity());
+    }
 }

@@ -124,9 +124,9 @@ public class HashMap<K, V> implements Map<K, V>
 		 * @param value The value in the key-value pair.
 		 * @param next  The next entry in this bucket.
 		 */
-		public Entry(K key, V value, Entry next)
+		public Entry(int hash, K key, V value, Entry next)
 		{
-			this.hash = key.hashCode();
+			this.hash = hash;
 			this.key = key;
 			this.value = value;
 			this.next = next;
@@ -208,9 +208,13 @@ public class HashMap<K, V> implements Map<K, V>
 	 *
 	 * @return <tt>true</tt> if this map contains a mapping for the specified
 	 * key
+	 * @throws NullPointerException When the key is <code>null</code>.
 	 */
 	@Override public boolean containsKey(Object key)
 	{
+		if (key == null)
+			throw new NullPointerException("Keys cannot be null.");
+
 		int         hashCode    = key.hashCode();
 		int         bucketIndex = hashCode % buckets.length;
 		Entry<K, V> current     = buckets[bucketIndex];
@@ -270,15 +274,19 @@ public class HashMap<K, V> implements Map<K, V>
 	 *
 	 * @return the value to which the specified key is mapped, or
 	 * {@code null} if this map contains no mapping for the key
+	 * @throws NullPointerException When the provided key is <code>null</code>.
 	 */
 	@Override public V get(Object key)
 	{
+		if (key == null)
+			throw new NullPointerException("Key cannot be null");
+
 		int         hashCode    = key.hashCode();
 		int         bucketIndex = hashCode % buckets.length;
 		Entry<K, V> current     = buckets[bucketIndex];
 
 		while (current != null) {
-			if (current.key.equals(key)) {
+			if (current.hash == hashCode && current.key.equals(key)) {
 				return current.getValue();
 			}
 
@@ -304,46 +312,20 @@ public class HashMap<K, V> implements Map<K, V>
 	 * (A <tt>null</tt> return can also indicate that the map
 	 * previously associated <tt>null</tt> with <tt>key</tt>,
 	 * if the implementation supports <tt>null</tt> values.)
+	 * @throws NullPointerException When the provided key is <code>null</code>.
 	 */
 	@Override public V put(K key, V value)
 	{
-		int         hashCode    = key.hashCode();
-		int         bucketIndex = hashCode % buckets.length;
-		Entry<K, V> head        = buckets[bucketIndex];
+		if (key == null)
+			throw new NullPointerException("Keys cannot be null");
 
-		if (head == null) {
-			buckets[bucketIndex] = new Entry<>(key, value, null);
-			size++;
-			if (needsExpansion())
-				expand();
-			return null;
-		}
+		int hashCode = key.hashCode();
 
-		if (head.key.equals(key)) {
-			V before = head.getValue();
-			head.setValue(value);
-			return before;
-		}
+		V result = place(buckets, hashCode, key, value, null);
+		if (needsExpansion(buckets, size))
+			expand();
 
-		Entry<K, V> previous = head;
-		Entry<K, V> current  = head.next;
-
-		while (true) {
-
-			if (current == null) {
-				previous.setNext(new Entry<>(key, value, previous));
-				size++;
-				return null;
-			}
-
-			if (current.key.equals(key)) {
-				current.setValue(value);
-				return current.value;
-			}
-
-			previous = current;
-			current = current.next;
-		}
+		return result;
 	}
 
 	/**
@@ -368,9 +350,14 @@ public class HashMap<K, V> implements Map<K, V>
 	 *
 	 * @return the previous value associated with <tt>key</tt>, or
 	 * <tt>null</tt> if there was no mapping for <tt>key</tt>.
+	 * @throws NullPointerException When the provided key is <code>null</code>.
 	 */
-	@Override public V remove(Object key)
+	@Override
+	public V remove(Object key)
 	{
+		if (key == null)
+			throw new NullPointerException("Keys cannot be null");
+
 		int         hashCode    = key.hashCode();
 		int         bucketIndex = hashCode % buckets.length;
 		Entry<K, V> head        = buckets[bucketIndex];
@@ -380,7 +367,7 @@ public class HashMap<K, V> implements Map<K, V>
 
 		while (current != null) {
 
-			if (current.key.equals(key)) {
+			if (current.hash == hashCode && current.key.equals(key)) {
 				V before = current.getValue();
 				if (previous != null)
 					previous.setNext(current.next);
@@ -409,12 +396,13 @@ public class HashMap<K, V> implements Map<K, V>
 	 *
 	 * @throws NullPointerException if the specified map is null
 	 */
-	@Override public void putAll(Map<? extends K, ? extends V> m)
+	@Override
+	public void putAll(Map<? extends K, ? extends V> m)
 	{
 		if (m == null)
 			throw new NullPointerException();
 
-		if (needsExpansion(m.size() + size)) {
+		if (needsExpansion(buckets, m.size() + size)) {
 			expand();
 		}
 
@@ -427,7 +415,8 @@ public class HashMap<K, V> implements Map<K, V>
 	 * Removes all of the mappings from this map (optional operation).
 	 * The map will be empty after this call returns.
 	 */
-	@Override public void clear()
+	@Override
+	public void clear()
 	{
 		this.size = 0;
 		this.buckets = (Entry<K, V>[]) new Entry[DEFAULT_CAPACITY];
@@ -448,7 +437,8 @@ public class HashMap<K, V> implements Map<K, V>
 	 *
 	 * @return a collection view of the values contained in this map
 	 */
-	@Override public Collection<V> values()
+	@Override
+	public Collection<V> values()
 	{
 		Collection<V> result = new ArrayList<>();
 		for (Entry<K, V> head : buckets) {
@@ -463,45 +453,46 @@ public class HashMap<K, V> implements Map<K, V>
 	}
 
 	/**
-	 * Checks if the {@link HashMap} needs an expansion with the provided number of entries. The {@link HashMap}
-	 * needs to be expanded when the number of entries equals or exceeds the <code>capacity * loadFactor</code>.
+	 * Checks if the storage needs expanding if it had the provided number of <code>entries</code>. The storage
+	 * needs to be expanded when the number of entries equals or exceeds the <code>storage.length(capacity) *
+	 * loadFactor</code>.
 	 *
-	 * @param entries The number of entries to use, when checking whether or not the {@link HashMap} needs to be
-	 *                expanded.
+	 * @param storage The storage.
+	 * @param entries The number of entries to use, when checking whether or not the storage needs to be expanded.
 	 *
-	 * @return Whether or not the {@link HashMap} needs an expansion.
+	 * @return Whether or not the storage needs an expansion.
 	 */
-	private boolean needsExpansion(int entries)
+
+	private boolean needsExpansion(Entry<K, V>[] storage, int entries)
 	{
-		return entries >= buckets.length * loadFactor;
+		return entries >= storage.length * loadFactor;
 	}
 
 	/**
-	 * Checks if the {@link HashMap} needs an expansion with the current number of entries. The {@link HashMap}
-	 * needs to
-	 * be expanded when the number of entries equals or exceeds the <code>capacity * loadFactor</code>.
+	 * Places an entry using the provided <code>hashCOde</code>, <code>key</code>, <code>value</code> and
+	 * <code>entry</code> into a bucket in the provided <code>storage</code>.
 	 *
-	 * @return Whether or not the {@link HashMap} needs an expansion.
+	 * @param storage  The storage where the buckets are stored.
+	 * @param hashCode The hashCode of the entry.
+	 * @param key      The key of the entry.
+	 * @param value    The value of the entry.
+	 * @param entry    An existing {@link Entry} instance. Can be provided so the method doesn't need to create a new
+	 *                 instance. A new instance will only be created if this argument is <code>null</code>.
+	 *
+	 * @return The value that was replaced. Returns <code>null</code> if no value was replaced.
 	 */
-	private boolean needsExpansion()
-	{
-		return needsExpansion(size);
-	}
-
 	private V place(Entry<K, V>[] storage, int hashCode, K key, V value, Entry<K, V> entry)
 	{
 		int         bucketIndex = hashCode % storage.length;
 		Entry<K, V> head        = storage[bucketIndex];
 
 		if (head == null) {
-			storage[bucketIndex] = entry == null ? new Entry<>(key, value, null) : entry;
+			storage[bucketIndex] = entry == null ? new Entry<>(hashCode, key, value, null) : entry;
 			size++;
-			if (needsExpansion())
-				expand();
 			return null;
 		}
 
-		if (head.key.equals(key)) {
+		if (head.hash == hashCode && head.key.equals(key)) {
 			V before = head.getValue();
 			head.setValue(value);
 			return before;
@@ -513,12 +504,12 @@ public class HashMap<K, V> implements Map<K, V>
 		while (true) {
 
 			if (current == null) {
-				previous.setNext(new Entry<>(key, value, previous));
+				previous.setNext(entry == null ? new Entry<>(hashCode, key, value, null) : entry);
 				size++;
 				return null;
 			}
 
-			if (current.key.equals(key)) {
+			if (current.hash == hashCode && current.key.equals(key)) {
 				current.setValue(value);
 				return current.value;
 			}
@@ -547,6 +538,8 @@ public class HashMap<K, V> implements Map<K, V>
 				current = current.next;
 			}
 		}
+
+		this.buckets = newArray;
 	}
 
 	/**
