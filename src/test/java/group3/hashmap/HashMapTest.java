@@ -215,6 +215,7 @@ public class HashMapTest
 
 		Set<java.util.Map.Entry<Integer, Integer>> entrySet = hashMap.entrySet();
 		entrySet.add(new HashMap.Entry<>(3, 3));
-		assertEquals(4, entrySet.size());
+		entrySet.remove(new HashMap.Entry<>(1, 1));
+		assertEquals(3, entrySet.size());
 	}
 }

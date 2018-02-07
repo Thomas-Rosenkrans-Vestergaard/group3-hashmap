@@ -199,11 +199,10 @@ public class HashMap<K, V> implements Map<K, V>
 		@Override public boolean equals(Object o)
 		{
 			if (this == o) return true;
-			if (!(o instanceof Entry)) return false;
-			Entry<?, ?> entry = (Entry<?, ?>) o;
-			return hash == entry.hash &&
-				   Objects.equals(key, entry.key) &&
-				   Objects.equals(value, entry.value);
+			if (!(o instanceof Map.Entry)) return false;
+			Map.Entry<?, ?> entry = (Map.Entry<?, ?>) o;
+			return Objects.equals(key, entry.getKey()) &&
+				   Objects.equals(value, entry.getValue());
 		}
 
 		@Override public int hashCode()
@@ -936,10 +935,11 @@ public class HashMap<K, V> implements Map<K, V>
 					if (current.equals(o)) {
 						if (previous != null)
 							previous.setNext(current.next);
+						size--;
 						return true;
 					}
 
-					previous = null;
+					previous = current;
 					current = current.next;
 				}
 			}
