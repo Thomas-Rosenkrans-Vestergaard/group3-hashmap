@@ -1,4 +1,4 @@
-package group3.hashmap;
+ package group3.hashmap;
 
 import java.util.*;
 
@@ -695,7 +695,7 @@ public class HashMap<K, V> implements Map<K, V>
 		}
 
 		/**
-		 * An implementation of the {@link Iterator} interface that enables iteration of the {@link HashMap} with
+		 * An implementation of the {@link Iterator} interface that enables iteration of the {@link EntrySet} with
 		 * minimal memory overhead.
 		 */
 		private class EntryIterator implements Iterator<Map.Entry<K, V>>
