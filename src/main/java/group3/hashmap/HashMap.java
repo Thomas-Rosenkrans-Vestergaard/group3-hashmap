@@ -1,4 +1,4 @@
- package group3.hashmap;
+package group3.hashmap;
 
 import java.util.*;
 
@@ -176,7 +176,6 @@ public class HashMap<K, V> implements Map<K, V>
 		 * Sets the value in the key-value pair.
 		 *
 		 * @param value The new value to set.
-		 *
 		 * @return The value just replaced.
 		 */
 		public V setValue(V value)
@@ -239,7 +238,6 @@ public class HashMap<K, V> implements Map<K, V>
 	 * at most one such mapping.)
 	 *
 	 * @param key key whose presence in this map is to be tested
-	 *
 	 * @return <tt>true</tt> if this map contains a mapping for the specified
 	 * key
 	 * @throws NullPointerException When the key is <code>null</code>.
@@ -270,7 +268,6 @@ public class HashMap<K, V> implements Map<K, V>
 	 * <tt>(value==null ? v==null : value.equals(v))</tt>.
 	 *
 	 * @param value value whose presence in this map is to be tested
-	 *
 	 * @return <tt>true</tt> if this map maps one or more keys to the
 	 * specified value
 	 */
@@ -305,7 +302,6 @@ public class HashMap<K, V> implements Map<K, V>
 	 * containsKey} operation may be used to distinguish these two cases.
 	 *
 	 * @param key the key whose associated value is to be returned
-	 *
 	 * @return the value to which the specified key is mapped, or
 	 * {@code null} if this map contains no mapping for the key
 	 * @throws NullPointerException When the provided key is <code>null</code>.
@@ -340,7 +336,6 @@ public class HashMap<K, V> implements Map<K, V>
 	 *
 	 * @param key   key with which the specified value is to be associated
 	 * @param value value to be associated with the specified key
-	 *
 	 * @return the previous value associated with <tt>key</tt>, or
 	 * <tt>null</tt> if there was no mapping for <tt>key</tt>.
 	 * (A <tt>null</tt> return can also indicate that the map
@@ -379,7 +374,6 @@ public class HashMap<K, V> implements Map<K, V>
 	 * call returns.
 	 *
 	 * @param key key whose mapping is to be removed from the map
-	 *
 	 * @return the previous value associated with <tt>key</tt>, or
 	 * <tt>null</tt> if there was no mapping for <tt>key</tt>.
 	 * @throws NullPointerException When the provided key is <code>null</code>.
@@ -425,7 +419,6 @@ public class HashMap<K, V> implements Map<K, V>
 	 * specified map is modified while the operation is in progress.
 	 *
 	 * @param m mappings to be stored in this map
-	 *
 	 * @throws NullPointerException if the specified map is null
 	 */
 	@Override
@@ -491,7 +484,6 @@ public class HashMap<K, V> implements Map<K, V>
 	 *
 	 * @param storage The storage.
 	 * @param entries The number of entries to use, when checking whether or not the storage needs to be expanded.
-	 *
 	 * @return Whether or not the storage needs an expansion.
 	 */
 
@@ -510,7 +502,6 @@ public class HashMap<K, V> implements Map<K, V>
 	 * @param value    The value of the entry.
 	 * @param entry    An existing {@link Entry} instance. Can be provided so the method doesn't need to create a new
 	 *                 instance. A new instance will only be created if this argument is <code>null</code>.
-	 *
 	 * @return The value that was replaced. Returns <code>null</code> if no value was replaced.
 	 */
 	public V placeInStorage(int hashCode, K key, V value, Entry<K, V> entry)
@@ -533,7 +524,6 @@ public class HashMap<K, V> implements Map<K, V>
 	 * @param value    The value of the entry.
 	 * @param entry    An existing {@link Entry} instance. Can be provided so the method doesn't need to create a new
 	 *                 instance. A new instance will only be created if this argument is <code>null</code>.
-	 *
 	 * @return The value that was replaced. Returns <code>null</code> if no value was replaced.
 	 */
 	private V place(Entry<K, V>[] storage, int hashCode, K key, V value, Entry<K, V> entry)
@@ -661,7 +651,6 @@ public class HashMap<K, V> implements Map<K, V>
 		 * <tt>(o==null&nbsp;?&nbsp;e==null&nbsp;:&nbsp;o.equals(e))</tt>.
 		 *
 		 * @param o element whose presence in this set is to be tested
-		 *
 		 * @return <tt>true</tt> if this set contains the specified element
 		 * @throws NullPointerException When the provided object is null.
 		 */
@@ -718,7 +707,7 @@ public class HashMap<K, V> implements Map<K, V>
 			 */
 			public EntryIterator()
 			{
-				for (int x = 0; x < 0; x++) {
+				for (int x = 0; x < buckets.length; x++) {
 					if (buckets[x] != null) {
 						nextEntry = buckets[x];
 						currentBucket = x;
@@ -760,7 +749,6 @@ public class HashMap<K, V> implements Map<K, V>
 			 * the head of the next bucket.
 			 *
 			 * @param current The last returned entry.
-			 *
 			 * @return Returns the next entry. Returns <code>null</code> if there are no next entries.
 			 */
 			private Entry<K, V> getNextEntry(Entry<K, V> current)
@@ -855,7 +843,6 @@ public class HashMap<K, V> implements Map<K, V>
 		 * @param a the array into which the elements of this set are to be
 		 *          stored, if it is big enough; otherwise, a new array of the same
 		 *          runtime type is allocated for this purpose.
-		 *
 		 * @return an array containing all the elements in this set
 		 * @throws ArrayStoreException  if the runtime type of the specified array
 		 *                              is not a supertype of the runtime type of every element in this
@@ -886,7 +873,6 @@ public class HashMap<K, V> implements Map<K, V>
 		 * restrictions on the elements that they may contain.
 		 *
 		 * @param entry element to be added to this set
-		 *
 		 * @return <tt>true</tt> if this set did not already contain the specified
 		 * element
 		 * @throws NullPointerException When the provided <code>entry</code> is null.
@@ -920,7 +906,6 @@ public class HashMap<K, V> implements Map<K, V>
 		 * call returns.)
 		 *
 		 * @param o object to be removed from this set, if present
-		 *
 		 * @return <tt>true</tt> if this set contained the specified element
 		 * @throws NullPointerException When the provided object is null.
 		 */
@@ -953,7 +938,6 @@ public class HashMap<K, V> implements Map<K, V>
 		 * method returns <tt>true</tt> if it is a <i>subset</i> of this set.
 		 *
 		 * @param c collection to be checked for containment in this set
-		 *
 		 * @return <tt>true</tt> if this set contains all of the elements of the
 		 * specified collection
 		 * @throws NullPointerException When encountering a null element in the provided collection.
@@ -982,7 +966,6 @@ public class HashMap<K, V> implements Map<K, V>
 		 * collection is modified while the operation is in progress.
 		 *
 		 * @param c collection containing elements to be added to this set
-		 *
 		 * @return <tt>true</tt> if this set changed as a result of the call
 		 * @throws NullPointerException if the specified collection contains one
 		 *                              or more null elements and this set does not permit null
@@ -1011,7 +994,6 @@ public class HashMap<K, V> implements Map<K, V>
 		 * <i>intersection</i> of the two sets.
 		 *
 		 * @param c collection containing elements to be retained in this set
-		 *
 		 * @return <tt>true</tt> if this set changed as a result of the call
 		 * @throws UnsupportedOperationException if the <tt>retainAll</tt> operation
 		 *                                       is not supported by this set
@@ -1037,7 +1019,6 @@ public class HashMap<K, V> implements Map<K, V>
 		 * the two sets.
 		 *
 		 * @param c collection containing elements to be removed from this set
-		 *
 		 * @return <tt>true</tt> if this set changed as a result of the call
 		 * @throws UnsupportedOperationException if the <tt>removeAll</tt> operation
 		 *                                       is not supported by this set
