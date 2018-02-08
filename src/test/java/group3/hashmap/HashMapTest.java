@@ -15,102 +15,102 @@ import static org.junit.Assert.*;
 public class HashMapTest
 {
 
-	private HashMap<Integer, Integer> instance;
+	private HashMap<Integer, Integer> map;
 
 	@Before
 	public void setUp()
 	{
-		this.instance = new HashMap<>();
+		this.map = new HashMap<>();
 	}
 
 	@Test
 	public void size() throws Exception
 	{
-		assertEquals(0, instance.size());
-		instance.put(0, 0);
-		assertEquals(1, instance.size());
-		instance.put(0, 0);
-		assertEquals(1, instance.size());
-		instance.put(1, 0);
-		assertEquals(2, instance.size());
+		assertEquals(0, map.size());
+		map.put(0, 0);
+		assertEquals(1, map.size());
+		map.put(0, 0);
+		assertEquals(1, map.size());
+		map.put(1, 0);
+		assertEquals(2, map.size());
 	}
 
 
 	@Test
 	public void isEmpty() throws Exception
 	{
-		assertTrue(instance.isEmpty());
-		instance.put(0, 0);
-		assertFalse(instance.isEmpty());
+		assertTrue(map.isEmpty());
+		map.put(0, 0);
+		assertFalse(map.isEmpty());
 	}
 
 	@Test
 	public void containsKey() throws Exception
 	{
-		assertFalse(instance.containsKey(0));
-		instance.put(0, 0);
-		assertTrue(instance.containsKey(0));
+		assertFalse(map.containsKey(0));
+		map.put(0, 0);
+		assertTrue(map.containsKey(0));
 	}
 
 	@Test(expected = NullPointerException.class)
 	public void containsKeyThrowsNullPointerException() throws Exception
 	{
-		instance.containsKey(null);
+		map.containsKey(null);
 	}
 
 	@Test
 	public void containsValue() throws Exception
 	{
-		assertFalse(instance.containsValue(1));
-		instance.put(0, 1);
-		assertTrue(instance.containsValue(1));
-		instance.remove(0);
-		assertFalse(instance.containsValue(1));
+		assertFalse(map.containsValue(1));
+		map.put(0, 1);
+		assertTrue(map.containsValue(1));
+		map.remove(0);
+		assertFalse(map.containsValue(1));
 	}
 
 	@Test
 	public void get() throws Exception
 	{
-		assertNull(instance.get(0));
-		instance.put(0, 15);
-		assertEquals(15, (long) instance.get(0));
+		assertNull(map.get(0));
+		map.put(0, 15);
+		assertEquals(15, (long) map.get(0));
 	}
 
 	@Test(expected = NullPointerException.class)
 	public void getThrowsNullPointerException() throws Exception
 	{
-		instance.get(null);
+		map.get(null);
 	}
 
 	@Test
 	public void put() throws Exception
 	{
-		assertFalse(instance.containsKey(0));
-		instance.put(0, 156);
-		assertTrue(instance.containsKey(0));
-		assertEquals(156, (long) instance.get(0));
-		assertEquals(156, (long) instance.put(0, 200));
+		assertFalse(map.containsKey(0));
+		map.put(0, 156);
+		assertTrue(map.containsKey(0));
+		assertEquals(156, (long) map.get(0));
+		assertEquals(156, (long) map.put(0, 200));
 	}
 
 	@Test(expected = NullPointerException.class)
 	public void putThrowsNullPointerException() throws Exception
 	{
-		instance.put(null, 1);
+		map.put(null, 1);
 	}
 
 	@Test
 	public void remove() throws Exception
 	{
-		instance.put(0, 250);
-		assertFalse(instance.isEmpty());
-		assertEquals(250, (long) instance.remove(0));
-		assertTrue(instance.isEmpty());
+		map.put(0, 250);
+		assertFalse(map.isEmpty());
+		assertEquals(250, (long) map.remove(0));
+		assertTrue(map.isEmpty());
 	}
 
 	@Test(expected = NullPointerException.class)
 	public void removeThrowsNullPointerException() throws Exception
 	{
-		instance.remove(null);
+		map.remove(null);
 	}
 
 	@Test
@@ -121,41 +121,41 @@ public class HashMapTest
 		parameter.put(1, 1);
 		parameter.put(2, 2);
 
-		assertEquals(0, instance.size());
-		instance.putAll(parameter);
-		assertEquals(3, instance.size());
+		assertEquals(0, map.size());
+		map.putAll(parameter);
+		assertEquals(3, map.size());
 	}
 
 	@Test(expected = NullPointerException.class)
 	public void putAllThrowsNullPointerException()
 	{
-		instance.putAll(null);
+		map.putAll(null);
 	}
 
 	@Test
 	public void clear() throws Exception
 	{
-		instance.put(0, 0);
-		instance.put(1, 1);
+		map.put(0, 0);
+		map.put(1, 1);
 
-		assertFalse(instance.isEmpty());
-		assertEquals(2, instance.size());
+		assertFalse(map.isEmpty());
+		assertEquals(2, map.size());
 
-		instance.clear();
+		map.clear();
 
-		assertTrue(instance.isEmpty());
-		assertEquals(0, instance.size());
+		assertTrue(map.isEmpty());
+		assertEquals(0, map.size());
 	}
 
 	@Test
 	public void values() throws Exception
 	{
-		instance.put(0, 0);
-		instance.put(1, 1);
-		instance.put(2, 2);
-		instance.put(9, 9);
+		map.put(0, 0);
+		map.put(1, 1);
+		map.put(2, 2);
+		map.put(9, 9);
 
-		Collection<Integer> values = instance.values();
+		Collection<Integer> values = map.values();
 
 		assertTrue(values.contains(0));
 		assertTrue(values.contains(1));
@@ -166,59 +166,65 @@ public class HashMapTest
 	@Test
 	public void getCapacity() throws Exception
 	{
-		assertEquals(16, instance.getCapacity());
-		instance = new HashMap<>(32);
-		assertEquals(32, instance.getCapacity());
+		assertEquals(16, map.getCapacity());
+		map = new HashMap<>(32);
+		assertEquals(32, map.getCapacity());
 	}
 
 	@Test
 	public void getLoadFactor() throws Exception
 	{
-		assertEquals(0.75, instance.getLoadFactor(), 0.0001);
-		instance = new HashMap<>(0.1);
-		assertEquals(0.1, instance.getLoadFactor(), 0.0001);
+		assertEquals(0.75, map.getLoadFactor(), 0.0001);
+		map = new HashMap<>(0.1);
+		assertEquals(0.1, map.getLoadFactor(), 0.0001);
 	}
 
 	@Test
 	public void canHandleCollisions() throws Exception
 	{
-		instance = new HashMap<>(10);
+		map = new HashMap<>(10);
 
-		instance.put(7, 1);
-		instance.put(17, 2);
-		instance.put(27, 3);
-		instance.put(37, 4);
-		instance.put(47, 5);
+		map.put(7, 1);
+		map.put(17, 2);
+		map.put(27, 3);
+		map.put(37, 4);
+		map.put(47, 5);
 
-		assertEquals(1, (long) instance.get(7));
-		assertEquals(2, (long) instance.get(17));
-		assertEquals(3, (long) instance.get(27));
-		assertEquals(4, (long) instance.get(37));
-		assertEquals(5, (long) instance.get(47));
+		assertEquals(1, (long) map.get(7));
+		assertEquals(2, (long) map.get(17));
+		assertEquals(3, (long) map.get(27));
+		assertEquals(4, (long) map.get(37));
+		assertEquals(5, (long) map.get(47));
 
-		assertEquals(5, instance.size());
+		assertEquals(5, map.size());
 	}
 
 	@Test
 	public void canExpand() throws Exception
 	{
-		instance = new HashMap<>(4);
-		assertEquals(4, instance.getCapacity());
-		instance.put(1, 1);
-		instance.put(2, 1);
-		instance.put(3, 1);
-		assertEquals(8, instance.getCapacity());
+		map = new HashMap<>(4);
+		assertEquals(4, map.getCapacity());
+		map.put(1, 1);
+		map.put(2, 1);
+		map.put(3, 1);
+		assertEquals(8, map.getCapacity());
 	}
 
 	@Test
 	public void entrySet() throws Exception
 	{
-		instance.put(0, 0);
-		instance.put(1, 1);
+		map.put(0, 0);
+		map.put(1, 1);
 
-		Set<java.util.Map.Entry<Integer, Integer>> entrySet = instance.entrySet();
+		Set<java.util.Map.Entry<Integer, Integer>> entrySet = map.entrySet();
 		entrySet.add(new HashMap.Pair<>(3, 3));
-		assertEquals(3, instance.size());
+		assertEquals(3, map.size());
+	}
+
+	@Test
+	public void entrySetCache() throws Exception
+	{
+		assertSame(map.entrySet(), map.entrySet());
 	}
 
 	public static class PairSetTest

@@ -33,6 +33,12 @@ public class HashMap<K, V> implements Map<K, V>
 	private Pair<K, V>[] buckets;
 
 	/**
+	 * Cached {@link PairSet} that can be returned when the
+	 * {@link HashMap#entrySet()} method is called.
+	 */
+	private PairSet cachePairSet = null;
+
+	/**
 	 * Creates a new empty HashMap.
 	 */
 	public HashMap()
@@ -616,7 +622,10 @@ public class HashMap<K, V> implements Map<K, V>
 	 */
 	@Override public PairSet entrySet()
 	{
-		return new PairSet();
+		if (cachePairSet == null)
+			cachePairSet = new PairSet();
+
+		return cachePairSet;
 	}
 
 	public class PairSet implements Set<Map.Entry<K, V>>
