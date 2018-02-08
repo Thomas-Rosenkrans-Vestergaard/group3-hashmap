@@ -33,16 +33,16 @@ public class HashMap<K, V> implements Map<K, V>
 	private Node<K, V>[] buckets;
 
 	/**
-	 * Cached {@link NodeSet} that can be returned when the
+	 * Cached {@link Set<Map.Entry<K, V>>} that can be returned when the
 	 * {@link HashMap#entrySet()} method is called.
 	 */
-	private NodeSet cachedPairSet = null;
+	private Set<Map.Entry<K, V>> cachedNodeSet = null;
 
 	/**
-	 * Cached {@link KeySet} that can be returned when the
+	 * Cached {@link Set<K>} that can be returned when the
 	 * {@link HashMap#keySet()} method is called.
 	 */
-	private KeySet cachedKeySet = null;
+	private Set<K> cachedKeySet = null;
 
 	/**
 	 * Creates a new empty HashMap.
@@ -338,8 +338,8 @@ public class HashMap<K, V> implements Map<K, V>
 	}
 
 	/**
-	 * Removes the mapping for a key from this map if it is present
-	 * (optional operation).   More formally, if this map contains a mapping
+	 * Removes the mapping for a key from this map if it is present.
+	 * More formally, if this map contains a mapping
 	 * from key <tt>k</tt> to value <tt>v</tt> such that
 	 * <code>(key==null ?  k==null : key.equals(k))</code>, that mapping
 	 * is removed.  (The map can contain at most one such mapping.)
@@ -729,18 +729,18 @@ public class HashMap<K, V> implements Map<K, V>
 	 *
 	 * @return a set view of the mappings contained in this map
 	 */
-	@Override public NodeSet entrySet()
+	@Override public Set<Map.Entry<K, V>> entrySet()
 	{
-		if (cachedPairSet == null)
-			cachedPairSet = new NodeSet();
+		if (cachedNodeSet == null)
+			cachedNodeSet = new NodeSet();
 
-		return cachedPairSet;
+		return cachedNodeSet;
 	}
 
 	/**
 	 * {@link HashMap} backed {@link Set} allowing for {@link Set} operations on the {@link HashMap}.
 	 */
-	public class NodeSet implements Set<Map.Entry<K, V>>
+	private class NodeSet implements Set<Map.Entry<K, V>>
 	{
 
 		/**
@@ -789,16 +789,16 @@ public class HashMap<K, V> implements Map<K, V>
 		 *
 		 * @return an iterator over the elements in this set
 		 */
-		@Override public PairIterator iterator()
+		@Override public NodeIterator iterator()
 		{
-			return new PairIterator();
+			return new NodeIterator();
 		}
 
 		/**
 		 * An implementation of the {@link Iterator} interface that enables iteration of the {@link NodeSet} with
 		 * minimal memory overhead.
 		 */
-		public class PairIterator implements Iterator<Map.Entry<K, V>>
+		private class NodeIterator implements Iterator<Map.Entry<K, V>>
 		{
 
 			/**
@@ -807,16 +807,16 @@ public class HashMap<K, V> implements Map<K, V>
 			private int currentBucket;
 
 			/**
-			 * The previously returned entry. The {@link PairIterator#hasNext()} method only returns
+			 * The previously returned entry. The {@link NodeIterator#hasNext()} method only returns
 			 * <code>true</code> when this field is not null. The next entry is found before returning the current
-			 * entry from the {@link PairIterator#next()} method.
+			 * entry from the {@link NodeIterator#next()} method.
 			 */
 			private Node<K, V> nextEntry;
 
 			/**
-			 * Creates a new {@link PairIterator}.
+			 * Creates a new {@link NodeIterator}.
 			 */
-			public PairIterator()
+			public NodeIterator()
 			{
 				for (int x = 0; x < buckets.length; x++) {
 					if (buckets[x] != null) {
@@ -920,11 +920,64 @@ public class HashMap<K, V> implements Map<K, V>
 		}
 
 		/**
-		 * Unsupported operation.
+		 * Returns an array containing all of the elements in this set; the
+		 * runtime type of the returned array is that of the specified array.
+		 * If the set fits in the specified array, it is returned therein.
+		 * Otherwise, a new array is allocated with the runtime type of the
+		 * specified array and the size of this set.
+		 * <p>
+		 * <p>If this set fits in the specified array with room to spare
+		 * (i.e., the array has more elements than this set), the element in
+		 * the array immediately following the end of the set is set to
+		 * <tt>null</tt>.  (This is useful in determining the length of this
+		 * set <i>only</i> if the caller knows that this set does not contain
+		 * any null elements.)
+		 * <p>
+		 * <p>If this set makes any guarantees as to what order its elements
+		 * are returned by its iterator, this method must return the elements
+		 * in the same order.
+		 * <p>
+		 * <p>Like the {@link #toArray()} method, this method acts as bridge between
+		 * array-based and collection-based APIs.  Further, this method allows
+		 * precise control over the runtime type of the output array, and may,
+		 * under certain circumstances, be used to save allocation costs.
+		 * <p>
+		 * <p>Suppose <tt>x</tt> is a set known to contain only strings.
+		 * The following code can be used to dump the set into a newly allocated
+		 * array of <tt>String</tt>:
+		 * <p>
+		 * <pre>
+		 *     String[] y = x.toArray(new String[0]);</pre>
+		 * <p>
+		 * Note that <tt>toArray(new Object[0])</tt> is identical in function to
+		 * <tt>toArray()</tt>.
+		 *
+		 * @param a the array into which the elements of this set are to be
+		 *          stored, if it is big enough; otherwise, a new array of the same
+		 *          runtime type is allocated for this purpose.
+		 *
+		 * @return an array containing all the elements in this set
+		 * @throws ArrayStoreException if the runtime type of the specified array
+		 *                             is not a supertype of the runtime type of every element in this
+		 *                             set
 		 */
 		@Override public <T> T[] toArray(T[] a)
 		{
-			throw new UnsupportedOperationException();
+			int size = size();
+			T[] r = a.length >= size && a != null ? a : (T[]) java.lang.reflect.Array.newInstance(
+					a.getClass().getComponentType(),
+					size
+			);
+
+			int nextIndex = 0;
+			for (Node<K, V> current : buckets) {
+				while (current != null) {
+					r[nextIndex++] = (T) current;
+					current = current.next;
+				}
+			}
+
+			return r;
 		}
 
 		/**
@@ -1082,7 +1135,7 @@ public class HashMap<K, V> implements Map<K, V>
 		 */
 		@Override public boolean retainAll(Collection<?> c)
 		{
-			if (c == null) {
+			if (c == null || c.isEmpty()) {
 				clear();
 				return true;
 			}
@@ -1124,7 +1177,7 @@ public class HashMap<K, V> implements Map<K, V>
 		 */
 		@Override public boolean removeAll(Collection<?> c)
 		{
-			if (c == null) {
+			if (c == null || c.isEmpty()) {
 				return false;
 			}
 
@@ -1174,7 +1227,7 @@ public class HashMap<K, V> implements Map<K, V>
 	/**
 	 * {@link HashMap} backed {@link Set} allowing for {@link Set} operations on the keys in the {@link HashMap}.
 	 */
-	public class KeySet implements Set<K>
+	private class KeySet implements Set<K>
 	{
 		/**
 		 * Returns the number of elements in this set (its cardinality).  If this
@@ -1220,7 +1273,7 @@ public class HashMap<K, V> implements Map<K, V>
 		 *
 		 * @return an iterator over the elements in this set
 		 */
-		@Override public KeyIterator iterator()
+		@Override public Iterator<K> iterator()
 		{
 			return new KeyIterator();
 		}
@@ -1229,7 +1282,7 @@ public class HashMap<K, V> implements Map<K, V>
 		 * Implementation of {@link Iterator} allowing iteration over the keys in the nodes in the {@link HashMap}
 		 * with minimal overhead.
 		 */
-		public class KeyIterator implements Iterator<K>
+		private class KeyIterator implements Iterator<K>
 		{
 
 			/**
@@ -1243,6 +1296,20 @@ public class HashMap<K, V> implements Map<K, V>
 			 * entry from the {@link KeySet.KeyIterator#next()} method.
 			 */
 			private Node<K, V> nextEntry;
+
+			/**
+			 * Creates a new {@link NodeSet.NodeIterator}.
+			 */
+			public KeyIterator()
+			{
+				for (int x = 0; x < buckets.length; x++) {
+					if (buckets[x] != null) {
+						nextEntry = buckets[x];
+						currentBucket = x;
+						break;
+					}
+				}
+			}
 
 			/**
 			 * Returns {@code true} if the iteration has more keys.
@@ -1322,10 +1389,10 @@ public class HashMap<K, V> implements Map<K, V>
 		 *
 		 * @return an array containing all the elements in this set
 		 */
-		@Override public K[] toArray()
+		@Override public Object[] toArray()
 		{
-			int nextIndex = 0;
-			K[] result    = (K[]) new Object[size];
+			int      nextIndex = 0;
+			Object[] result    = new Object[size];
 			for (Node<K, V> current : buckets) {
 				while (current != null) {
 					result[nextIndex++] = current.key;
@@ -1334,6 +1401,67 @@ public class HashMap<K, V> implements Map<K, V>
 			}
 
 			return result;
+		}
+
+		/**
+		 * Returns an array containing all of the elements in this set; the
+		 * runtime type of the returned array is that of the specified array.
+		 * If the set fits in the specified array, it is returned therein.
+		 * Otherwise, a new array is allocated with the runtime type of the
+		 * specified array and the size of this set.
+		 * <p>
+		 * <p>If this set fits in the specified array with room to spare
+		 * (i.e., the array has more elements than this set), the element in
+		 * the array immediately following the end of the set is set to
+		 * <tt>null</tt>.  (This is useful in determining the length of this
+		 * set <i>only</i> if the caller knows that this set does not contain
+		 * any null elements.)
+		 * <p>
+		 * <p>If this set makes any guarantees as to what order its elements
+		 * are returned by its iterator, this method must return the elements
+		 * in the same order.
+		 * <p>
+		 * <p>Like the {@link #toArray()} method, this method acts as bridge between
+		 * array-based and collection-based APIs.  Further, this method allows
+		 * precise control over the runtime type of the output array, and may,
+		 * under certain circumstances, be used to save allocation costs.
+		 * <p>
+		 * <p>Suppose <tt>x</tt> is a set known to contain only strings.
+		 * The following code can be used to dump the set into a newly allocated
+		 * array of <tt>String</tt>:
+		 * <p>
+		 * <pre>
+		 *     String[] y = x.toArray(new String[0]);</pre>
+		 * <p>
+		 * Note that <tt>toArray(new Object[0])</tt> is identical in function to
+		 * <tt>toArray()</tt>.
+		 *
+		 * @param a the array into which the elements of this set are to be
+		 *          stored, if it is big enough; otherwise, a new array of the same
+		 *          runtime type is allocated for this purpose.
+		 *
+		 * @return an array containing all the elements in this set
+		 * @throws ArrayStoreException if the runtime type of the specified array
+		 *                             is not a supertype of the runtime type of every element in this
+		 *                             set
+		 */
+		@Override public <T> T[] toArray(T[] a)
+		{
+			int size = size();
+			T[] r = a.length >= size && a != null ? a : (T[]) java.lang.reflect.Array.newInstance(
+					a.getClass().getComponentType(),
+					size
+			);
+
+			int nextIndex = 0;
+			for (Node<K, V> current : buckets) {
+				while (current != null) {
+					r[nextIndex++] = (T) current.key;
+					current = current.next;
+				}
+			}
+
+			return r;
 		}
 
 		/**
@@ -1368,16 +1496,18 @@ public class HashMap<K, V> implements Map<K, V>
 		 */
 		@Override public boolean containsAll(Collection<?> c)
 		{
-			if (c != null) {
-				for (int x = 0; x < buckets.length; x++) {
-					Node<K, V> current = buckets[x];
-					while (current != null) {
-						if (!c.contains(current.key)) {
-							return false;
-						}
+			if (c == null || c.isEmpty()) {
+				return true;
+			}
 
-						current = current.next;
+			for (int x = 0; x < buckets.length; x++) {
+				Node<K, V> current = buckets[x];
+				while (current != null) {
+					if (!c.contains(current.key)) {
+						return false;
 					}
+
+					current = current.next;
 				}
 			}
 
@@ -1399,7 +1529,7 @@ public class HashMap<K, V> implements Map<K, V>
 		 */
 		@Override public boolean retainAll(Collection<?> c)
 		{
-			if (c == null) {
+			if (c == null || c.isEmpty()) {
 				clear();
 				return true;
 			}
@@ -1441,7 +1571,7 @@ public class HashMap<K, V> implements Map<K, V>
 		 */
 		@Override public boolean removeAll(Collection<?> c)
 		{
-			if (c == null) {
+			if (c == null || c.isEmpty()) {
 				return false;
 			}
 
@@ -1468,14 +1598,6 @@ public class HashMap<K, V> implements Map<K, V>
 		 * Unsupported operation.
 		 */
 		@Override public boolean addAll(Collection<? extends K> c)
-		{
-			throw new UnsupportedOperationException();
-		}
-
-		/**
-		 * Unsupported operation.
-		 */
-		@Override public <T> T[] toArray(T[] a)
 		{
 			throw new UnsupportedOperationException();
 		}
