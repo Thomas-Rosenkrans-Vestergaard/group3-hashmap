@@ -254,25 +254,12 @@ public class HashMap<K, V> implements Map<K, V>
 	 *
 	 * @return <tt>true</tt> if this map contains a mapping for the specified
 	 * key
-	 * @throws NullPointerException When the key is <code>null</code>.
 	 */
 	@Override public boolean containsKey(Object key)
 	{
-		if (key == null)
-			throw new NullPointerException("Keys cannot be null.");
+		Node<K, V> node = findPair(hash(key), key);
 
-		int        hashCode    = key.hashCode();
-		int        bucketIndex = hashCode % buckets.length;
-		Node<K, V> current     = buckets[bucketIndex];
-
-		while (current != null) {
-			if (current.hash == hashCode && current.key.equals(key))
-				return true;
-
-			current = current.next;
-		}
-
-		return false;
+		return node != null;
 	}
 
 	/**
@@ -320,7 +307,6 @@ public class HashMap<K, V> implements Map<K, V>
 	 *
 	 * @return the value to which the specified key is mapped, or
 	 * {@code null} if this map contains no mapping for the key
-	 * @throws NullPointerException When the provided key is <code>null</code>.
 	 */
 	@Override public V get(Object key)
 	{
@@ -391,19 +377,16 @@ public class HashMap<K, V> implements Map<K, V>
 	 * specified map is modified while the operation is in progress.
 	 *
 	 * @param m mappings to be stored in this map
-	 *
-	 * @throws NullPointerException if the specified map is null
 	 */
 	@Override
 	public void putAll(Map<? extends K, ? extends V> m)
 	{
-		if (m == null)
-			throw new NullPointerException("The map provided to the putAll method cannot be null.");
-
-		for (Map.Entry<? extends K, ? extends V> entry : m.entrySet()) {
-			K key   = entry.getKey();
-			V value = entry.getValue();
-			placeNodeThis(hash(key), key, value, null);
+		if (m != null) {
+			for (Map.Entry<? extends K, ? extends V> entry : m.entrySet()) {
+				K key   = entry.getKey();
+				V value = entry.getValue();
+				placeNodeThis(hash(key), key, value, null);
+			}
 		}
 	}
 

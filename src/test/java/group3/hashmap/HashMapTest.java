@@ -108,12 +108,6 @@ public class HashMapTest
 		assertEquals(3, map.size());
 	}
 
-	@Test(expected = NullPointerException.class)
-	public void putAllThrowsNullPointerException()
-	{
-		map.putAll(null);
-	}
-
 	@Test
 	public void clear() throws Exception
 	{
