@@ -193,7 +193,7 @@ public class HashMap<K, V> implements Map<K, V>
 		 */
 		public V setValue(V value)
 		{
-			V before = value;
+			V before = this.value;
 			this.value = value;
 			return before;
 		}
@@ -203,7 +203,7 @@ public class HashMap<K, V> implements Map<K, V>
 		 *
 		 * @param next The reference to set.
 		 */
-		public void setNext(Node next)
+		void setNext(Node<K, V> next)
 		{
 			this.next = next;
 		}
@@ -779,7 +779,7 @@ public class HashMap<K, V> implements Map<K, V>
 		{
 			Node<K, V> found = findFromEntry(o);
 
-			return found != null ? true : false;
+			return found != null;
 		}
 
 		/**
@@ -816,7 +816,7 @@ public class HashMap<K, V> implements Map<K, V>
 			/**
 			 * Creates a new {@link NodeIterator}.
 			 */
-			public NodeIterator()
+			NodeIterator()
 			{
 				for (int x = 0; x < buckets.length; x++) {
 					if (buckets[x] != null) {
@@ -1300,7 +1300,7 @@ public class HashMap<K, V> implements Map<K, V>
 			/**
 			 * Creates a new {@link NodeSet.NodeIterator}.
 			 */
-			public KeyIterator()
+			KeyIterator()
 			{
 				for (int x = 0; x < buckets.length; x++) {
 					if (buckets[x] != null) {
@@ -1448,10 +1448,10 @@ public class HashMap<K, V> implements Map<K, V>
 		@Override public <T> T[] toArray(T[] a)
 		{
 			int size = size();
-			T[] r = a.length >= size && a != null ? a : (T[]) java.lang.reflect.Array.newInstance(
+			T[] r = a == null || (a != null && a.length < size) ? (T[]) java.lang.reflect.Array.newInstance(
 					a.getClass().getComponentType(),
 					size
-			);
+			) : a;
 
 			int nextIndex = 0;
 			for (Node<K, V> current : buckets) {
@@ -1500,8 +1500,8 @@ public class HashMap<K, V> implements Map<K, V>
 				return true;
 			}
 
-			for (int x = 0; x < buckets.length; x++) {
-				Node<K, V> current = buckets[x];
+			for (Node<K, V> bucket : buckets) {
+				Node<K, V> current = bucket;
 				while (current != null) {
 					if (!c.contains(current.key)) {
 						return false;
