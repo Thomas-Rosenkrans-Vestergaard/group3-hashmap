@@ -76,12 +76,6 @@ public class HashMapTest
 		assertEquals(15, (long) map.get(0));
 	}
 
-	@Test(expected = NullPointerException.class)
-	public void getThrowsNullPointerException() throws Exception
-	{
-		map.get(null);
-	}
-
 	@Test
 	public void put() throws Exception
 	{
@@ -92,12 +86,6 @@ public class HashMapTest
 		assertEquals(156, (long) map.put(0, 200));
 	}
 
-	@Test(expected = NullPointerException.class)
-	public void putThrowsNullPointerException() throws Exception
-	{
-		map.put(null, 1);
-	}
-
 	@Test
 	public void remove() throws Exception
 	{
@@ -105,12 +93,6 @@ public class HashMapTest
 		assertFalse(map.isEmpty());
 		assertEquals(250, (long) map.remove(0));
 		assertTrue(map.isEmpty());
-	}
-
-	@Test(expected = NullPointerException.class)
-	public void removeThrowsNullPointerException() throws Exception
-	{
-		map.remove(null);
 	}
 
 	@Test
@@ -166,9 +148,9 @@ public class HashMapTest
 	@Test
 	public void getCapacity() throws Exception
 	{
-		assertEquals(16, map.getCapacity());
+		assertEquals(16, map.capacity());
 		map = new HashMap<>(32);
-		assertEquals(32, map.getCapacity());
+		assertEquals(32, map.capacity());
 	}
 
 	@Test
@@ -203,11 +185,11 @@ public class HashMapTest
 	public void canExpand() throws Exception
 	{
 		map = new HashMap<>(4);
-		assertEquals(4, map.getCapacity());
+		assertEquals(4, map.capacity());
 		map.put(1, 1);
 		map.put(2, 1);
 		map.put(3, 1);
-		assertEquals(8, map.getCapacity());
+		assertEquals(8, map.capacity());
 	}
 
 	@Test
@@ -217,7 +199,7 @@ public class HashMapTest
 		map.put(1, 1);
 
 		Set<java.util.Map.Entry<Integer, Integer>> entrySet = map.entrySet();
-		entrySet.add(new HashMap.Pair<>(3, 3));
+		entrySet.add(new HashMap.Node<>(3, 3));
 		assertEquals(3, map.size());
 	}
 
@@ -227,15 +209,15 @@ public class HashMapTest
 		assertSame(map.entrySet(), map.entrySet());
 	}
 
-	public static class PairSetTest
+	public static class NodeSetTest
 	{
 
 		private HashMap<Integer, Integer> map;
-		private HashMap.PairSet           set;
+		private HashMap.NodeSet           set;
 
-		private HashMap.Pair<Integer, Integer> pair(Integer key, Integer value)
+		private HashMap.Node<Integer, Integer> pair(Integer key, Integer value)
 		{
-			return new HashMap.Pair<>(key, value);
+			return new HashMap.Node<>(key, value);
 		}
 
 		@Before
@@ -282,12 +264,6 @@ public class HashMapTest
 			assertTrue(set.contains(pair(1, 1)));
 		}
 
-		@Test(expected = NullPointerException.class)
-		public void containsThrowsNullPointerException()
-		{
-			set.contains(null);
-		}
-
 		@Test
 		public void iterator()
 		{
@@ -295,7 +271,7 @@ public class HashMapTest
 			map.put(1, 1);
 			map.put(2, 2);
 
-			HashMap.PairSet.PairIterator it = set.iterator();
+			HashMap.NodeSet.PairIterator it = set.iterator();
 
 			int counter = 0;
 			while (it.hasNext() == true) {
@@ -305,12 +281,12 @@ public class HashMapTest
 			assertEquals(3, counter);
 		}
 
-		public static class PairIteratorTest
+		public static class NodeIteratorTest
 		{
 
 			private HashMap<Integer, Integer>    map;
-			private HashMap.PairSet              set;
-			private HashMap.PairSet.PairIterator it;
+			private HashMap.NodeSet              set;
+			private HashMap.NodeSet.PairIterator it;
 
 			@Before
 			public void setUp()
@@ -322,7 +298,7 @@ public class HashMapTest
 			@Test
 			public void hasNext()
 			{
-				HashMap.PairSet.PairIterator it = set.iterator();
+				HashMap.NodeSet.PairIterator it = set.iterator();
 
 				assertTrue(set.isEmpty());
 				assertFalse(it.hasNext());
@@ -347,9 +323,9 @@ public class HashMapTest
 				hasNext();
 			}
 
-			private HashMap.Pair<Integer, Integer> pair(Integer key, Integer value)
+			private HashMap.Node<Integer, Integer> pair(Integer key, Integer value)
 			{
-				return new HashMap.Pair<>(key, value);
+				return new HashMap.Node<>(key, value);
 			}
 		}
 
@@ -368,37 +344,6 @@ public class HashMapTest
 		}
 
 		@Test
-		public void toArrayArgument()
-		{
-			// No elements
-			Object[] array = (HashMap.Pair<Integer,
-					Integer>[]) new
-					HashMap.Pair[0];
-			array = set.<Object>toArray(array);
-			assertEquals(0, array.length);
-
-			// Exact length
-			array = (Object[]) new HashMap.Pair[3];
-			set.add(pair(0, 0));
-			set.add(pair(1, 1));
-			set.add(pair(2, 2));
-			array = set.<Object>toArray(array);
-			assertEquals(3, array.length);
-
-			// Greater length
-			set.add(pair(3, 3));
-			array = (Object[]) new HashMap.Pair[3];
-			array = set.<Object>toArray(array);
-			assertEquals(4, array.length);
-		}
-
-		@Test(expected = NullPointerException.class)
-		public void toArrayArgumentThrowsNullPointerException() throws Exception
-		{
-			set.toArray(null);
-		}
-
-		@Test
 		public void add() throws Exception
 		{
 			assertFalse(set.contains(pair(0, 0)));
@@ -406,13 +351,6 @@ public class HashMapTest
 			set.add(pair(0, 0));
 			assertTrue(set.contains(pair(0, 0)));
 			assertTrue(map.containsKey(0));
-		}
-
-
-		@Test(expected = NullPointerException.class)
-		public void addThrowsNullPointerException() throws Exception
-		{
-			set.add(null);
 		}
 
 		@Test
@@ -430,19 +368,13 @@ public class HashMapTest
 			assertFalse(map.containsKey(1));
 		}
 
-		@Test(expected = NullPointerException.class)
-		public void removeThrowsNullPointerException() throws Exception
-		{
-			set.remove(null);
-		}
-
 		@Test
 		public void containsAll() throws Exception
 		{
 			set.add(pair(0, 0));
 			set.add(pair(1, 1));
 
-			Collection<HashMap.Pair<Integer, Integer>> c;
+			Collection<HashMap.Node<Integer, Integer>> c;
 
 			c = new ArrayList<>();
 			assertFalse(set.containsAll(c));
@@ -457,16 +389,10 @@ public class HashMapTest
 			assertTrue(set.containsAll(c));
 		}
 
-		@Test(expected = NullPointerException.class)
-		public void containsAllThrowsNullPointerException() throws Exception
-		{
-			set.contains(null);
-		}
-
 		@Test
 		public void addAll() throws Exception
 		{
-			Collection<HashMap.Pair<Integer, Integer>> c;
+			Collection<HashMap.Node<Integer, Integer>> c;
 
 			c = new ArrayList<>();
 
@@ -483,12 +409,6 @@ public class HashMapTest
 			assertEquals(2, set.size());
 		}
 
-		@Test(expected = NullPointerException.class)
-		public void addAllThrowsNullPointerException() throws Exception
-		{
-			set.addAll(null);
-		}
-
 		@Test
 		public void retainAll() throws Exception
 		{
@@ -496,7 +416,7 @@ public class HashMapTest
 			set.add(pair(1, 1));
 			set.add(pair(2, 2));
 
-			Collection<HashMap.Pair<Integer, Integer>> c;
+			Collection<HashMap.Node<Integer, Integer>> c;
 
 			c = new ArrayList<>();
 			assertTrue(set.retainAll(c));
@@ -519,12 +439,6 @@ public class HashMapTest
 			assertFalse(set.contains(pair(2, 2)));
 		}
 
-		@Test(expected = NullPointerException.class)
-		public void retainAllThrowsNullPointerException() throws Exception
-		{
-			set.retainAll(null);
-		}
-
 		@Test
 		public void removeAll()
 		{
@@ -532,7 +446,7 @@ public class HashMapTest
 			set.add(pair(1, 1));
 			set.add(pair(2, 2));
 
-			Collection<HashMap.Pair<Integer, Integer>> c;
+			Collection<HashMap.Node<Integer, Integer>> c;
 
 			c = new ArrayList<>();
 			assertFalse(set.removeAll(c));
@@ -546,20 +460,6 @@ public class HashMapTest
 			assertTrue(set.contains(pair(0, 0)));
 			assertFalse(set.contains(pair(1, 1)));
 			assertFalse(set.contains(pair(2, 2)));
-		}
-
-		@Test(expected = NullPointerException.class)
-		public void removeAllThrowsNullPointerException() throws Exception
-		{
-			set.removeAll(null);
-		}
-
-		@Test(expected = NullPointerException.class)
-		public void removeAllThrowsNullPointerExceptionOnElement() throws Exception
-		{
-			Collection<HashMap.Pair<Integer, Integer>> c = new ArrayList<>();
-			c.add(null);
-			set.removeAll(c);
 		}
 
 		@Test

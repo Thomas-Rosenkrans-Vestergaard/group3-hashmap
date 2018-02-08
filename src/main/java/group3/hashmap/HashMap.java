@@ -30,13 +30,13 @@ public class HashMap<K, V> implements Map<K, V>
 	/**
 	 * The buckets storing the entries in the {@link HashMap}.
 	 */
-	private Pair<K, V>[] buckets;
+	private Node<K, V>[] buckets;
 
 	/**
-	 * Cached {@link PairSet} that can be returned when the
+	 * Cached {@link NodeSet} that can be returned when the
 	 * {@link HashMap#entrySet()} method is called.
 	 */
-	private PairSet cachedPairSet = null;
+	private NodeSet cachedPairSet = null;
 
 	/**
 	 * Cached {@link KeySet} that can be returned when the
@@ -83,7 +83,7 @@ public class HashMap<K, V> implements Map<K, V>
 	public HashMap(int capacity, double loadFactor)
 	{
 		this.loadFactor = loadFactor;
-		this.buckets = (Pair<K, V>[]) new Pair[capacity];
+		this.buckets = (Node<K, V>[]) new Node[capacity];
 		this.size = 0;
 	}
 
@@ -98,12 +98,12 @@ public class HashMap<K, V> implements Map<K, V>
 	}
 
 	/**
-	 * Represents a key-value pair in the {@link HashMap}.
+	 * Represents a key-value node in the {@link HashMap}.
 	 *
 	 * @param <K> The key type.
 	 * @param <V> The value type.
 	 */
-	public static class Pair<K, V> implements Map.Entry<K, V>
+	public static class Node<K, V> implements Map.Entry<K, V>
 	{
 
 		/**
@@ -112,28 +112,28 @@ public class HashMap<K, V> implements Map<K, V>
 		private final int hash;
 
 		/**
-		 * The key of the key-value pair.
+		 * The key of the key-value node.
 		 */
 		private final K key;
 
 		/**
-		 * The value of the key-value pair.
+		 * The value of the key-value node.
 		 */
 		private V value;
 
 		/**
 		 * The next entry in this bucket.
 		 */
-		private Pair<K, V> next;
+		private Node<K, V> next;
 
 		/**
-		 * Creates a new key-value pair.
+		 * Creates a new key-value node.
 		 *
-		 * @param key   The key in the key-value pair.
-		 * @param value The value in the key-value pair.
+		 * @param key   The key in the key-value node.
+		 * @param value The value in the key-value node.
 		 * @param next  The next entry in the bucket.
 		 */
-		public Pair(int hash, K key, V value, Pair<K, V> next)
+		public Node(int hash, K key, V value, Node<K, V> next)
 		{
 			this.hash = hash;
 			this.key = key;
@@ -142,32 +142,32 @@ public class HashMap<K, V> implements Map<K, V>
 		}
 
 		/**
-		 * Creates a new key-value pair.
+		 * Creates a new key-value node.
 		 *
-		 * @param key   The key in the key-value pair.
-		 * @param value The value in the key-value pair.
-		 * @param next  The next pair in the bucket.
+		 * @param key   The key in the key-value node.
+		 * @param value The value in the key-value node.
+		 * @param next  The next node in the bucket.
 		 */
-		public Pair(K key, V value, Pair<K, V> next)
+		public Node(K key, V value, Node<K, V> next)
 		{
 			this(key.hashCode(), key, value, next);
 		}
 
 		/**
-		 * Creates a new key-value pair.
+		 * Creates a new key-value node.
 		 *
-		 * @param key   The key in the key-value pair.
-		 * @param value The value in the key-value pair.
+		 * @param key   The key in the key-value node.
+		 * @param value The value in the key-value node.
 		 */
-		public Pair(K key, V value)
+		public Node(K key, V value)
 		{
 			this(key.hashCode(), key, value, null);
 		}
 
 		/**
-		 * Returns the key in the key-value pair.
+		 * Returns the key in the key-value node.
 		 *
-		 * @return The key in the key-value pair.
+		 * @return The key in the key-value node.
 		 */
 		public K getKey()
 		{
@@ -175,9 +175,9 @@ public class HashMap<K, V> implements Map<K, V>
 		}
 
 		/**
-		 * Returns the value in the key-value pair.
+		 * Returns the value in the key-value node.
 		 *
-		 * @return The value in the key-value pair.
+		 * @return The value in the key-value node.
 		 */
 		public V getValue()
 		{
@@ -185,9 +185,10 @@ public class HashMap<K, V> implements Map<K, V>
 		}
 
 		/**
-		 * Sets the value in the key-value pair.
+		 * Sets the value in the key-value node.
 		 *
 		 * @param value The new value to set.
+		 *
 		 * @return The value just replaced.
 		 */
 		public V setValue(V value)
@@ -198,11 +199,11 @@ public class HashMap<K, V> implements Map<K, V>
 		}
 
 		/**
-		 * Sets the reference to the next key-value pair in the bucket.
+		 * Sets the reference to the next key-value node in the bucket.
 		 *
 		 * @param next The reference to set.
 		 */
-		public void setNext(Pair next)
+		public void setNext(Node next)
 		{
 			this.next = next;
 		}
@@ -250,6 +251,7 @@ public class HashMap<K, V> implements Map<K, V>
 	 * at most one such mapping.)
 	 *
 	 * @param key key whose presence in this map is to be tested
+	 *
 	 * @return <tt>true</tt> if this map contains a mapping for the specified
 	 * key
 	 * @throws NullPointerException When the key is <code>null</code>.
@@ -261,7 +263,7 @@ public class HashMap<K, V> implements Map<K, V>
 
 		int        hashCode    = key.hashCode();
 		int        bucketIndex = hashCode % buckets.length;
-		Pair<K, V> current     = buckets[bucketIndex];
+		Node<K, V> current     = buckets[bucketIndex];
 
 		while (current != null) {
 			if (current.hash == hashCode && current.key.equals(key))
@@ -280,13 +282,14 @@ public class HashMap<K, V> implements Map<K, V>
 	 * <tt>(value==null ? v==null : value.equals(v))</tt>.
 	 *
 	 * @param value value whose presence in this map is to be tested
+	 *
 	 * @return <tt>true</tt> if this map maps one or more keys to the
 	 * specified value
 	 */
 	@Override public boolean containsValue(Object value)
 	{
-		for (Pair<K, V> head : buckets) {
-			Pair<K, V> current = head;
+		for (Node<K, V> head : buckets) {
+			Node<K, V> current = head;
 			while (current != null) {
 				if (current.value.equals(value))
 					return true;
@@ -314,28 +317,16 @@ public class HashMap<K, V> implements Map<K, V>
 	 * containsKey} operation may be used to distinguish these two cases.
 	 *
 	 * @param key the key whose associated value is to be returned
+	 *
 	 * @return the value to which the specified key is mapped, or
 	 * {@code null} if this map contains no mapping for the key
 	 * @throws NullPointerException When the provided key is <code>null</code>.
 	 */
 	@Override public V get(Object key)
 	{
-		if (key == null)
-			throw new NullPointerException("Key cannot be null");
+		Node<K, V> node = findPair(hash(key), key);
 
-		int        hashCode    = key.hashCode();
-		int        bucketIndex = hashCode % buckets.length;
-		Pair<K, V> current     = buckets[bucketIndex];
-
-		while (current != null) {
-			if (current.hash == hashCode && current.key.equals(key)) {
-				return current.getValue();
-			}
-
-			current = current.next;
-		}
-
-		return null;
+		return node == null ? null : node.value;
 	}
 
 	/**
@@ -348,23 +339,16 @@ public class HashMap<K, V> implements Map<K, V>
 	 *
 	 * @param key   key with which the specified value is to be associated
 	 * @param value value to be associated with the specified key
+	 *
 	 * @return the previous value associated with <tt>key</tt>, or
 	 * <tt>null</tt> if there was no mapping for <tt>key</tt>.
 	 * (A <tt>null</tt> return can also indicate that the map
 	 * previously associated <tt>null</tt> with <tt>key</tt>,
 	 * if the implementation supports <tt>null</tt> values.)
-	 * @throws NullPointerException When the provided key is <code>null</code>.
 	 */
 	@Override public V put(K key, V value)
 	{
-		if (key == null)
-			throw new NullPointerException("Keys cannot be null");
-
-		int hashCode = key.hashCode();
-
-		V result = placeInStorage(hashCode, key, value, null);
-
-		return result;
+		return placeNodeThis(hash(key), key, value, null);
 	}
 
 	/**
@@ -386,40 +370,16 @@ public class HashMap<K, V> implements Map<K, V>
 	 * call returns.
 	 *
 	 * @param key key whose mapping is to be removed from the map
+	 *
 	 * @return the previous value associated with <tt>key</tt>, or
 	 * <tt>null</tt> if there was no mapping for <tt>key</tt>.
-	 * @throws NullPointerException When the provided key is <code>null</code>.
 	 */
 	@Override
 	public V remove(Object key)
 	{
-		if (key == null)
-			throw new NullPointerException("Keys cannot be null");
+		Node<K, V> removed = removeNode(hash(key), key);
 
-		int        hashCode    = key.hashCode();
-		int        bucketIndex = hashCode % buckets.length;
-		Pair<K, V> head        = buckets[bucketIndex];
-
-		Pair<K, V> previous = null;
-		Pair<K, V> current  = head;
-
-		while (current != null) {
-
-			if (current.hash == hashCode && current.key.equals(key)) {
-				V before = current.getValue();
-				if (previous != null)
-					previous.setNext(current.next);
-				else
-					buckets[bucketIndex] = current.next;
-				size--;
-				return before;
-			}
-
-			previous = current;
-			current = current.next;
-		}
-
-		return null;
+		return removed == null ? null : removed.value;
 	}
 
 	/**
@@ -431,20 +391,19 @@ public class HashMap<K, V> implements Map<K, V>
 	 * specified map is modified while the operation is in progress.
 	 *
 	 * @param m mappings to be stored in this map
+	 *
 	 * @throws NullPointerException if the specified map is null
 	 */
 	@Override
 	public void putAll(Map<? extends K, ? extends V> m)
 	{
 		if (m == null)
-			throw new NullPointerException();
-
-		if (needsExpansion(buckets, m.size() + size)) {
-			expand();
-		}
+			throw new NullPointerException("The map provided to the putAll method cannot be null.");
 
 		for (Map.Entry<? extends K, ? extends V> entry : m.entrySet()) {
-			this.put(entry.getKey(), entry.getValue());
+			K key   = entry.getKey();
+			V value = entry.getValue();
+			placeNodeThis(hash(key), key, value, null);
 		}
 	}
 
@@ -455,8 +414,14 @@ public class HashMap<K, V> implements Map<K, V>
 	@Override
 	public void clear()
 	{
-		this.size = 0;
-		this.buckets = (Pair<K, V>[]) new Pair[DEFAULT_CAPACITY];
+		if (size > 0) {
+			for (int x = 0; size > 0 && x < buckets.length; x++) {
+				if (buckets[x] != null) {
+					buckets[x] = null;
+					size--;
+				}
+			}
+		}
 	}
 
 	/**
@@ -478,8 +443,8 @@ public class HashMap<K, V> implements Map<K, V>
 	public Collection<V> values()
 	{
 		Collection<V> result = new ArrayList<>();
-		for (Pair<K, V> head : buckets) {
-			Pair<K, V> current = head;
+		for (Node<K, V> head : buckets) {
+			Node<K, V> current = head;
 			while (current != null) {
 				result.add(current.value);
 				current = current.next;
@@ -490,169 +455,13 @@ public class HashMap<K, V> implements Map<K, V>
 	}
 
 	/**
-	 * Checks if the storage needs expanding if it had the provided number of <code>entries</code>. The storage
-	 * needs to be expanded when the number of entries equals or exceeds the <code>storage.length(capacity) *
-	 * loadFactor</code>.
-	 *
-	 * @param storage The storage.
-	 * @param entries The number of entries to use, when checking whether or not the storage needs to be expanded.
-	 * @return Whether or not the storage needs an expansion.
-	 */
-
-	private boolean needsExpansion(Pair<K, V>[] storage, int entries)
-	{
-		return entries >= storage.length * loadFactor;
-	}
-
-	/**
-	 * Places an pair using the provided <code>hashCode</code>, <code>key</code>, <code>value</code> and
-	 * <code>pair</code> into a bucket in <code>this.buckets</code>. The internal storage of the {@link HashMap}
-	 * might then be expanded.
-	 *
-	 * @param hashCode The hashCode of the pair.
-	 * @param key      The key of the pair.
-	 * @param value    The value of the pair.
-	 * @param pair     An existing {@link Pair} instance. Can be provided so the method doesn't need to create a new
-	 *                 instance. A new instance will only be created if this argument is <code>null</code>.
-	 * @return The value that was replaced. Returns <code>null</code> if no value was replaced.
-	 */
-	public V placeInStorage(int hashCode, K key, V value, Pair<K, V> pair)
-	{
-		V replace = place(buckets, hashCode, key, value, pair);
-		if (needsExpansion(buckets, size))
-			expand();
-
-		return replace;
-	}
-
-	/**
-	 * Places an pair using the provided <code>hashCode</code>, <code>key</code>, <code>value</code> and
-	 * <code>pair</code> into a bucket in the provided <code>storage</code>. The storage cannot be expanded by this
-	 * method.
-	 *
-	 * @param storage  The storage where the buckets are stored.
-	 * @param hashCode The hashCode of the pair.
-	 * @param key      The key of the pair.
-	 * @param value    The value of the pair.
-	 * @param pair     An existing {@link Pair} instance. Can be provided so the method doesn't need to create a new
-	 *                 instance. A new instance will only be created if this argument is <code>null</code>.
-	 * @return The value that was replaced. Returns <code>null</code> if no value was replaced.
-	 */
-	private V place(Pair<K, V>[] storage, int hashCode, K key, V value, Pair<K, V> pair)
-	{
-		int        bucketIndex = hashCode % storage.length;
-		Pair<K, V> head        = storage[bucketIndex];
-
-		if (head == null) {
-			storage[bucketIndex] = pair == null ? new Pair<>(hashCode, key, value, null) : pair;
-			size++;
-			return null;
-		}
-
-		if (head.hash == hashCode && head.key.equals(key)) {
-			V before = head.getValue();
-			head.setValue(value);
-			return before;
-		}
-
-		Pair<K, V> previous = head;
-		Pair<K, V> current  = head.next;
-
-		while (true) {
-
-			if (current == null) {
-				previous.setNext(pair == null ? new Pair<>(hashCode, key, value, null) : pair);
-				size++;
-				return null;
-			}
-
-			if (current.hash == hashCode && current.key.equals(key)) {
-				current.setValue(value);
-				return current.value;
-			}
-
-			previous = current;
-			current = current.next;
-		}
-	}
-
-	/**
-	 * Finds the pair matching the key from the provided pair.
-	 *
-	 * @param pair The pair providing the key to match.
-	 * @return The matching pair. Returns null if no pair could be found.
-	 */
-	private Pair<K, V> findFromKey(Pair<K, V> pair)
-	{
-		return findFromKey(pair.hash, pair.key);
-	}
-
-	/**
-	 * Finds the pair matching the provided key.
-	 *
-	 * @param key The key of the pair to find.
-	 * @return The matching pair. Returns null if no pair could be found.
-	 */
-	private Pair<K, V> findFromKey(K key)
-	{
-		return findFromKey(key.hashCode(), key);
-	}
-
-	/**
-	 * Finds the pair matching the provided hash and key.
-	 *
-	 * @param hashCode The hash to find the matching pair from.
-	 * @param key      The key to find the matching pair from.
-	 * @return The matching pair. Returns null if no pair could be found.
-	 */
-	private Pair<K, V> findFromKey(int hashCode, K key)
-	{
-
-		int        bucketIndex = hashCode % buckets.length;
-		Pair<K, V> current     = buckets[bucketIndex];
-
-		while (current != null) {
-			if (current.hash == hashCode && current.key.equals(key)) {
-				return current;
-			}
-
-			current = current.next;
-		}
-
-		return null;
-	}
-
-	/**
-	 * Expands the {@link HashMap} by doubling the <code>capacity</code> and expanding the entries.
-	 */
-	private void expand()
-	{
-		int count = 0;
-
-		Pair<K, V>[] newArray = (Pair<K, V>[]) new Pair[buckets.length * 2];
-
-		for (Pair<K, V> head : buckets) {
-			if (count == size)
-				break;
-			Pair<K, V> current = head;
-			while (current != null) {
-				place(newArray, current.hash, current.key, current.value, current);
-				count++;
-				current = current.next;
-			}
-		}
-
-		this.buckets = newArray;
-	}
-
-	/**
 	 * Returns the current capacity of the {@link HashMap}. The capacity is the number of buckets in the
 	 * {@link HashMap}. The capacity will automatically increase depending on the <code>loadFactor</code> of the
 	 * {@link HashMap}.
 	 *
 	 * @return The current capacity.
 	 */
-	public int getCapacity()
+	public int capacity()
 	{
 		return this.buckets.length;
 	}
@@ -670,17 +479,285 @@ public class HashMap<K, V> implements Map<K, V>
 	}
 
 	/**
-	 * Unsupported operation.
+	 * Checks if the storage needs expanding if it had the provided number of <code>entries</code>. The storage
+	 * needs to be expanded when the number of entries equals or exceeds the <code>storage.length(capacity) *
+	 * loadFactor</code>.
+	 *
+	 * @param storage The storage.
+	 * @param entries The number of entries to use, when checking whether or not the storage needs to be expanded.
+	 *
+	 * @return Whether or not the storage needs an expansion.
 	 */
-	@Override public PairSet entrySet()
+
+	private boolean needsExpansion(Node<K, V>[] storage, int entries)
+	{
+		return entries >= storage.length * loadFactor;
+	}
+
+	/**
+	 * Places an node using the provided <code>hashCode</code>, <code>key</code>, <code>value</code> and
+	 * <code>node</code> into a bucket in <code>this.buckets</code>. The internal storage of the {@link HashMap}
+	 * might then be expanded.
+	 *
+	 * @param hashCode The hashCode of the node.
+	 * @param key      The key of the node.
+	 * @param value    The value of the node.
+	 * @param node     An existing {@link Node} instance. Can be provided so the method doesn't need to create a new
+	 *                 instance. A new instance will only be created if this argument is <code>null</code>.
+	 *
+	 * @return The value that was replaced. Returns <code>null</code> if no value was replaced.
+	 */
+	private V placeNodeThis(int hashCode, K key, V value, Node<K, V> node)
+	{
+		V replace = placeNode(buckets, hashCode, key, value, node);
+		if (needsExpansion(buckets, size))
+			expand();
+
+		return replace;
+	}
+
+	/**
+	 * Places an node using the provided <code>hashCode</code>, <code>key</code>, <code>value</code> and
+	 * <code>node</code> into a bucket in the provided <code>storage</code>. The storage cannot be expanded by this
+	 * method.
+	 *
+	 * @param storage  The storage where the buckets are stored.
+	 * @param hashCode The hashCode of the node.
+	 * @param key      The key of the node.
+	 * @param value    The value of the node.
+	 * @param node     An existing {@link Node} instance. Can be provided so the method doesn't need to create a new
+	 *                 instance. A new instance will only be created if this argument is <code>null</code>.
+	 *
+	 * @return The value that was replaced. Returns <code>null</code> if no value was replaced.
+	 */
+	private V placeNode(Node<K, V>[] storage, int hashCode, K key, V value, Node<K, V> node)
+	{
+		int        bucketIndex = hashCode % storage.length;
+		Node<K, V> head        = storage[bucketIndex];
+
+		if (head == null) {
+			storage[bucketIndex] = node == null ? new Node<>(hashCode, key, value, null) : node;
+			size++;
+			return null;
+		}
+
+		if (head.hash == hashCode && head.key.equals(key)) {
+			V before = head.getValue();
+			head.setValue(value);
+			return before;
+		}
+
+		Node<K, V> previous = head;
+		Node<K, V> current  = head.next;
+
+		while (true) {
+
+			if (current == null) {
+				previous.setNext(node == null ? new Node<>(hashCode, key, value, null) : node);
+				size++;
+				return null;
+			}
+
+			if (current.hash == hashCode && current.key.equals(key)) {
+				current.setValue(value);
+				return current.value;
+			}
+
+			previous = current;
+			current = current.next;
+		}
+	}
+
+	/**
+	 * Removes the {@link Node} with the provided <code>hash</code> and <code>key</code> from the map.
+	 *
+	 * @param hash The <code>hash</code> of the {@link Node} to remove.
+	 * @param key  The <code>key</code> of the {@link Node} to remove.
+	 *
+	 * @return The removed {@link Node}. Returns <code>null</code> if no {@link Node} was removed.
+	 */
+	private Node<K, V> removeNode(int hash, Object key)
+	{
+		int        bucketIndex = hash % buckets.length;
+		Node<K, V> head        = buckets[bucketIndex];
+
+		Node<K, V> previous = null;
+		Node<K, V> current  = head;
+
+		while (current != null) {
+			if (matches(current, hash, key)) {
+				if (previous != null)
+					previous.setNext(current.next);
+				else
+					buckets[bucketIndex] = current.next;
+				size--;
+				return current;
+			}
+
+			previous = current;
+			current = current.next;
+		}
+
+		return null;
+	}
+
+	/**
+	 * Removes the provided {@link Node} from the {@link HashMap}.
+	 *
+	 * @param node The {@link Node} to remove from the {@link HashMap}.
+	 *
+	 * @return The removed {@link Node}. Returns <code>null</code> if no {@link Node} was removed.
+	 */
+	private Node<K, V> removeNode(Node<K, V> node)
+	{
+		return removeNode(node.hash, node.key);
+	}
+
+	/**
+	 * Finds the node matching the provided hash and key.
+	 *
+	 * @param hash The hash to find the matching node from.
+	 * @param key  The key to find the matching node from.
+	 *
+	 * @return The matching node. Returns null if no node could be found.
+	 */
+	private Node<K, V> findPair(int hash, Object key)
+	{
+
+		int        bucketIndex = hash % buckets.length;
+		Node<K, V> current     = buckets[bucketIndex];
+
+		while (current != null) {
+			if (current.key == key || (current.hash == hash && current.key.equals(key))) {
+				return current;
+			}
+
+			current = current.next;
+		}
+
+		return null;
+	}
+
+	private Node<K, V> findFromEntry(Object o)
+	{
+		if (!(o instanceof Map.Entry)) {
+			return null;
+		}
+
+		Map.Entry e   = (Map.Entry) o;
+		Object    key = e.getKey();
+		return findPair(hash(key), key, e.getValue());
+	}
+
+	/**
+	 * Finds the node matching the provided hash and key.
+	 *
+	 * @param hash  The hash to find the matching node from.
+	 * @param key   The key to find the matching node from.
+	 * @param value An optional value that the matching <code>node</code> must also match.
+	 *
+	 * @return The matching node. Returns null if no node could be found.
+	 */
+	private Node<K, V> findPair(int hash, Object key, Object value)
+	{
+
+		int        bucketIndex = hash % buckets.length;
+		Node<K, V> current     = buckets[bucketIndex];
+
+		while (current != null) {
+			if ((current.key == key || (current.hash == hash && current.key.equals(key))) &&
+				(value == current.value || (value == null || value.equals(current.value)))) {
+				if (value == null || value.equals(current.value)) {
+					return current;
+				}
+			}
+
+			current = current.next;
+		}
+
+		return null;
+	}
+
+	/**
+	 * Expands the {@link HashMap} by doubling the <code>capacity</code> and expanding the entries.
+	 */
+	private void expand()
+	{
+		int count = 0;
+
+		Node<K, V>[] newArray = (Node<K, V>[]) new Node[buckets.length * 2];
+
+		for (Node<K, V> head : buckets) {
+			if (count == size)
+				break;
+			Node<K, V> current = head;
+			while (current != null) {
+				placeNode(newArray, current.hash, current.key, current.value, current);
+				count++;
+				current = current.next;
+			}
+		}
+
+		this.buckets = newArray;
+	}
+
+	/**
+	 * Checks if the provided <code>node</code> matches with the provided <code>hash</code> and <code>key</code>. The
+	 * variables match when
+	 *
+	 * @param node The <code>node</code> to match the <code>hash</code> and <code>key</code> to.
+	 * @param hash The <code>hash</code> the <code>node</code> must match.
+	 * @param key  The <code>key</code> the <code>node</code> must match.
+	 *
+	 * @return <code>true</code> if the provided <code>node</code> matches with the provided <code>hash</code> and
+	 * <code>key</code>.
+	 */
+	private boolean matches(Node<K, V> node, int hash, Object key)
+	{
+		return node.key == key || node.hash == hash;
+	}
+
+	/**
+	 * Hashes the provided key.
+	 *
+	 * @param key The key to hash.
+	 *
+	 * @return The resulting hash.
+	 */
+	private int hash(Object key)
+	{
+		int h;
+		return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
+	}
+
+	/**
+	 * Returns a {@link Set} view of the mappings contained in this map.
+	 * The set is backed by the map, so changes to the map are
+	 * reflected in the set, and vice-versa.  If the map is modified
+	 * while an iteration over the set is in progress (except through
+	 * the iterator's own <tt>remove</tt> operation, or through the
+	 * <tt>setValue</tt> operation on a map entry returned by the
+	 * iterator) the results of the iteration are undefined.  The set
+	 * supports element removal, which removes the corresponding
+	 * mapping from the map, via the <tt>Iterator.remove</tt>,
+	 * <tt>Set.remove</tt>, <tt>removeAll</tt>, <tt>retainAll</tt> and
+	 * <tt>clear</tt> operations.  It does not support the
+	 * <tt>add</tt> or <tt>addAll</tt> operations.
+	 *
+	 * @return a set view of the mappings contained in this map
+	 */
+	@Override public NodeSet entrySet()
 	{
 		if (cachedPairSet == null)
-			cachedPairSet = new PairSet();
+			cachedPairSet = new NodeSet();
 
 		return cachedPairSet;
 	}
 
-	public class PairSet implements Set<Map.Entry<K, V>>
+	/**
+	 * {@link HashMap} backed {@link Set} allowing for {@link Set} operations on the {@link HashMap}.
+	 */
+	public class NodeSet implements Set<Map.Entry<K, V>>
 	{
 
 		/**
@@ -712,24 +789,14 @@ public class HashMap<K, V> implements Map<K, V>
 		 * <tt>(o==null&nbsp;?&nbsp;e==null&nbsp;:&nbsp;o.equals(e))</tt>.
 		 *
 		 * @param o element whose presence in this set is to be tested
+		 *
 		 * @return <tt>true</tt> if this set contains the specified element
-		 * @throws NullPointerException When the provided object is null.
 		 */
 		@Override public boolean contains(Object o)
 		{
-			if (o == null)
-				throw new NullPointerException("Argument given to contains cannot be null.");
+			Node<K, V> found = findFromEntry(o);
 
-			for (Pair<K, V> current : buckets) {
-				while (current != null) {
-					if (current.equals(o))
-						return true;
-
-					current = current.next;
-				}
-			}
-
-			return false;
+			return found != null ? true : false;
 		}
 
 		/**
@@ -745,7 +812,7 @@ public class HashMap<K, V> implements Map<K, V>
 		}
 
 		/**
-		 * An implementation of the {@link Iterator} interface that enables iteration of the {@link PairSet} with
+		 * An implementation of the {@link Iterator} interface that enables iteration of the {@link NodeSet} with
 		 * minimal memory overhead.
 		 */
 		public class PairIterator implements Iterator<Map.Entry<K, V>>
@@ -761,7 +828,7 @@ public class HashMap<K, V> implements Map<K, V>
 			 * <code>true</code> when this field is not null. The next entry is found before returning the current
 			 * entry from the {@link PairIterator#next()} method.
 			 */
-			private Pair<K, V> nextEntry;
+			private Node<K, V> nextEntry;
 
 			/**
 			 * Creates a new {@link PairIterator}.
@@ -795,12 +862,12 @@ public class HashMap<K, V> implements Map<K, V>
 			 * @return the next element in the iteration
 			 * @throws NoSuchElementException if the iteration has no more elements
 			 */
-			@Override public Pair<K, V> next()
+			@Override public Node<K, V> next()
 			{
 				if (nextEntry == null)
 					throw new NoSuchElementException();
 
-				Pair<K, V> result = nextEntry;
+				Node<K, V> result = nextEntry;
 				nextEntry = getNextEntry(result);
 				return result;
 			}
@@ -810,9 +877,10 @@ public class HashMap<K, V> implements Map<K, V>
 			 * the head of the next bucket.
 			 *
 			 * @param current The last returned entry.
+			 *
 			 * @return Returns the next entry. Returns <code>null</code> if there are no next entries.
 			 */
-			private Pair<K, V> getNextEntry(Pair<K, V> current)
+			private Node<K, V> getNextEntry(Node<K, V> current)
 			{
 				if (current.next == null)
 					return getNextHead();
@@ -825,7 +893,7 @@ public class HashMap<K, V> implements Map<K, V>
 			 *
 			 * @return The head of the next bucket. Returns <code>null</code> if there are no more heads.
 			 */
-			private Pair<K, V> getNextHead()
+			private Node<K, V> getNextHead()
 			{
 				for (int x = currentBucket + 1; x < buckets.length; x++) {
 					if (buckets[x] != null) {
@@ -854,11 +922,11 @@ public class HashMap<K, V> implements Map<K, V>
 		 *
 		 * @return an array containing all the elements in this set
 		 */
-		@Override public Pair<K, V>[] toArray()
+		@Override public Node<K, V>[] toArray()
 		{
 			int          nextIndex = 0;
-			Pair<K, V>[] result    = (Pair<K, V>[]) new Pair[size];
-			for (Pair<K, V> current : buckets) {
+			Node<K, V>[] result    = (Node<K, V>[]) new Node[size];
+			for (Node<K, V> current : buckets) {
 				while (current != null) {
 					result[nextIndex++] = current;
 					current = current.next;
@@ -869,65 +937,11 @@ public class HashMap<K, V> implements Map<K, V>
 		}
 
 		/**
-		 * Returns an array containing all of the elements in this set; the
-		 * runtime type of the returned array is that of the specified array.
-		 * If the set fits in the specified array, it is returned therein.
-		 * Otherwise, a new array is allocated with the runtime type of the
-		 * specified array and the size of this set.
-		 * <p>
-		 * <p>If this set fits in the specified array with room to spare
-		 * (i.e., the array has more elements than this set), the element in
-		 * the array immediately following the end of the set is set to
-		 * <tt>null</tt>.  (This is useful in determining the length of this
-		 * set <i>only</i> if the caller knows that this set does not contain
-		 * any null elements.)
-		 * <p>
-		 * <p>If this set makes any guarantees as to what order its elements
-		 * are returned by its iterator, this method must return the elements
-		 * in the same order.
-		 * <p>
-		 * <p>Like the {@link #toArray()} method, this method acts as bridge between
-		 * array-based and collection-based APIs.  Further, this method allows
-		 * precise control over the runtime type of the output array, and may,
-		 * under certain circumstances, be used to save allocation costs.
-		 * <p>
-		 * <p>Suppose <tt>x</tt> is a set known to contain only strings.
-		 * The following code can be used to dump the set into a newly allocated
-		 * array of <tt>String</tt>:
-		 * <p>
-		 * <pre>
-		 *     String[] y = x.toArray(new String[0]);</pre>
-		 * <p>
-		 * Note that <tt>toArray(new Object[0])</tt> is identical in function to
-		 * <tt>toArray()</tt>.
-		 *
-		 * @param a the array into which the elements of this set are to be
-		 *          stored, if it is big enough; otherwise, a new array of the same
-		 *          runtime type is allocated for this purpose.
-		 * @return an array containing all the elements in this set
-		 * @throws ArrayStoreException  if the runtime type of the specified array
-		 *                              is not a supertype of the runtime type of every element in this
-		 *                              set
-		 * @throws NullPointerException if the specified array is null
+		 * Unsupported operation.
 		 */
 		@Override public <T> T[] toArray(T[] a)
 		{
-			if (a == null)
-				throw new NullPointerException("Array cannot be null.");
-
-			int size = size();
-			T[] r = a.length >= size ? a :
-					(T[]) java.lang.reflect.Array
-							.newInstance(a.getClass().getComponentType(), size);
-			PairIterator it = iterator();
-
-			int nextIndex = 0;
-			while (it.hasNext()) {
-				r[nextIndex] = (T) it.next();
-				nextIndex++;
-			}
-
-			return r;
+			throw new UnsupportedOperationException();
 		}
 
 		/**
@@ -949,16 +963,16 @@ public class HashMap<K, V> implements Map<K, V>
 		 * restrictions on the elements that they may contain.
 		 *
 		 * @param entry element to be added to this set
+		 *
 		 * @return <tt>true</tt> if this set did not already contain the specified
 		 * element
-		 * @throws NullPointerException When the provided <code>entry</code> is null.
 		 */
 		@Override public boolean add(Map.Entry<K, V> entry)
 		{
 			if (entry == null)
-				throw new NullPointerException("Pair cannot be null.");
+				return false;
 
-			for (Pair<K, V> current : buckets) {
+			for (Node<K, V> current : buckets) {
 				while (current != null) {
 					if (current.equals(entry))
 						return false;
@@ -968,7 +982,7 @@ public class HashMap<K, V> implements Map<K, V>
 			}
 
 			K key = entry.getKey();
-			placeInStorage(key.hashCode(), key, entry.getValue(), null);
+			placeNodeThis(key.hashCode(), key, entry.getValue(), null);
 			return true;
 		}
 
@@ -983,19 +997,21 @@ public class HashMap<K, V> implements Map<K, V>
 		 * call returns.)
 		 *
 		 * @param o object to be removed from this set, if present
+		 *
 		 * @return <tt>true</tt> if this set contained the specified element
-		 * @throws NullPointerException When the provided object is null.
 		 */
 		@Override public boolean remove(Object o)
 		{
-			if (o == null)
-				throw new NullPointerException("Pair cannot be null.");
+			if (!(o instanceof Map.Entry))
+				return false;
+
+			Map.Entry<K, V> e = (Map.Entry<K, V>) o;
 
 			for (int x = 0; x < buckets.length; x++) {
-				Pair<K, V> current  = buckets[x];
-				Pair<K, V> previous = null;
+				Node<K, V> current  = buckets[x];
+				Node<K, V> previous = null;
 				while (current != null) {
-					if (current.equals(o)) {
+					if (current.equals(e)) {
 						if (previous != null)
 							previous.setNext(current.next);
 						else
@@ -1018,24 +1034,23 @@ public class HashMap<K, V> implements Map<K, V>
 		 * method returns <tt>true</tt> if it is a <i>subset</i> of this set.
 		 *
 		 * @param c collection to be checked for containment in this set
+		 *
 		 * @return <tt>true</tt> if this set contains all of the elements of the
 		 * specified collection
-		 * @throws NullPointerException When encountering a null element in the provided collection.
 		 * @see #contains(Object)
 		 */
 		@Override public boolean containsAll(Collection<?> c)
 		{
-			if (c == null)
-				throw new NullPointerException();
+			if (c != null) {
+				for (int x = 0; x < buckets.length; x++) {
+					Node<K, V> current = buckets[x];
+					while (current != null) {
+						if (!c.contains(current)) {
+							return false;
+						}
 
-			for (int x = 0; x < buckets.length; x++) {
-				Pair<K, V> current = buckets[x];
-				while (current != null) {
-					if (!c.contains(current)) {
-						return false;
+						current = current.next;
 					}
-
-					current = current.next;
 				}
 			}
 
@@ -1051,19 +1066,18 @@ public class HashMap<K, V> implements Map<K, V>
 		 * collection is modified while the operation is in progress.
 		 *
 		 * @param c collection containing elements to be added to this set
+		 *
 		 * @return <tt>true</tt> if this set changed as a result of the call
-		 * @throws NullPointerException if the specified collection contains one
-		 *                              or more null elements and this set does not permit null
-		 *                              elements, or if the specified collection is null
 		 * @see #add(Object)
 		 */
 		@Override public boolean addAll(Collection<? extends Map.Entry<K, V>> c)
 		{
 			boolean changed = false;
-
-			for (Map.Entry<K, V> entry : c) {
-				if (add(entry)) {
-					changed = true;
+			if (c != null) {
+				for (Map.Entry<K, V> entry : c) {
+					if (add(entry)) {
+						changed = true;
+					}
 				}
 			}
 
@@ -1079,21 +1093,21 @@ public class HashMap<K, V> implements Map<K, V>
 		 * <i>intersection</i> of the two sets.
 		 *
 		 * @param c collection containing elements to be retained in this set
+		 *
 		 * @return <tt>true</tt> if this set changed as a result of the call
-		 * @throws NullPointerException If the collection c is
-		 *                              <code>null</code>.
 		 * @see #remove(Object)
 		 */
 		@Override public boolean retainAll(Collection<?> c)
 		{
-			if (c == null)
-				throw new NullPointerException();
+			if (c == null) {
+				clear();
+				return true;
+			}
 
 			boolean changed = false;
-
 			for (int x = 0; x < buckets.length; x++) {
-				Pair<K, V> current  = buckets[x];
-				Pair<K, V> previous = null;
+				Node<K, V> current  = buckets[x];
+				Node<K, V> previous = null;
 				while (current != null) {
 					if (!c.contains(current)) {
 						if (previous != null)
@@ -1120,14 +1134,17 @@ public class HashMap<K, V> implements Map<K, V>
 		 * the two sets.
 		 *
 		 * @param c collection containing elements to be removed from this set
+		 *
 		 * @return <tt>true</tt> if this set changed as a result of the call
-		 * @throws NullPointerException When the provided collection
-		 *                              c is null.
 		 * @see #remove(Object)
 		 * @see #contains(Object)
 		 */
 		@Override public boolean removeAll(Collection<?> c)
 		{
+			if (c == null) {
+				return false;
+			}
+
 			boolean changed = false;
 			for (Object o : c) {
 				if (remove(o)) {
@@ -1171,6 +1188,9 @@ public class HashMap<K, V> implements Map<K, V>
 		return cachedKeySet;
 	}
 
+	/**
+	 * {@link HashMap} backed {@link Set} allowing for {@link Set} operations on the keys in the {@link HashMap}.
+	 */
 	public class KeySet implements Set<K>
 	{
 		/**
@@ -1202,19 +1222,12 @@ public class HashMap<K, V> implements Map<K, V>
 		 * <tt>(o==null&nbsp;?&nbsp;e==null&nbsp;:&nbsp;o.equals(e))</tt>.
 		 *
 		 * @param o element whose presence in this set is to be tested
+		 *
 		 * @return <tt>true</tt> if this set contains the specified element
-		 * @throws NullPointerException When the provided object is null.
 		 */
 		@Override public boolean contains(Object o)
 		{
-			if (o == null)
-				throw new NullPointerException("Null keys not allowed.");
-
-			try {
-				return findFromKey((K) o) == null ? false : true;
-			} catch (ClassCastException e) {
-				return false;
-			}
+			return findPair(hash(o), o) != null;
 		}
 
 		/**
@@ -1229,6 +1242,10 @@ public class HashMap<K, V> implements Map<K, V>
 			return new KeyIterator();
 		}
 
+		/**
+		 * Implementation of {@link Iterator} allowing iteration over the keys in the nodes in the {@link HashMap}
+		 * with minimal overhead.
+		 */
 		public class KeyIterator implements Iterator<K>
 		{
 
@@ -1238,11 +1255,11 @@ public class HashMap<K, V> implements Map<K, V>
 			private int currentBucket;
 
 			/**
-			 * The previously returned entry. The {@link PairSet.PairIterator#hasNext()} method only returns
+			 * The previously returned entry. The {@link KeySet.KeyIterator#hasNext()} method only returns
 			 * <code>true</code> when this field is not null. The next entry is found before returning the current
-			 * entry from the {@link PairSet.PairIterator#next()} method.
+			 * entry from the {@link KeySet.KeyIterator#next()} method.
 			 */
-			private Pair<K, V> nextEntry;
+			private Node<K, V> nextEntry;
 
 			/**
 			 * Returns {@code true} if the iteration has more keys.
@@ -1267,7 +1284,7 @@ public class HashMap<K, V> implements Map<K, V>
 				if (nextEntry == null)
 					throw new NoSuchElementException();
 
-				Pair<K, V> result = nextEntry;
+				Node<K, V> result = nextEntry;
 				nextEntry = getNextEntry(result);
 				return result.key;
 			}
@@ -1277,9 +1294,10 @@ public class HashMap<K, V> implements Map<K, V>
 			 * the head of the next bucket.
 			 *
 			 * @param current The last returned entry.
+			 *
 			 * @return Returns the next entry. Returns <code>null</code> if there are no next entries.
 			 */
-			private Pair<K, V> getNextEntry(Pair<K, V> current)
+			private Node<K, V> getNextEntry(Node<K, V> current)
 			{
 				if (current.next == null)
 					return getNextHead();
@@ -1292,7 +1310,7 @@ public class HashMap<K, V> implements Map<K, V>
 			 *
 			 * @return The head of the next bucket. Returns <code>null</code> if there are no more heads.
 			 */
-			private Pair<K, V> getNextHead()
+			private Node<K, V> getNextHead()
 			{
 				for (int x = currentBucket + 1; x < buckets.length; x++) {
 					if (buckets[x] != null) {
@@ -1325,7 +1343,7 @@ public class HashMap<K, V> implements Map<K, V>
 		{
 			int nextIndex = 0;
 			K[] result    = (K[]) new Object[size];
-			for (Pair<K, V> current : buckets) {
+			for (Node<K, V> current : buckets) {
 				while (current != null) {
 					result[nextIndex++] = current.key;
 					current = current.next;
@@ -1333,79 +1351,6 @@ public class HashMap<K, V> implements Map<K, V>
 			}
 
 			return result;
-		}
-
-		/**
-		 * Returns an array containing all of the elements in this set; the
-		 * runtime type of the returned array is that of the specified array.
-		 * If the set fits in the specified array, it is returned therein.
-		 * Otherwise, a new array is allocated with the runtime type of the
-		 * specified array and the size of this set.
-		 * <p>
-		 * <p>If this set fits in the specified array with room to spare
-		 * (i.e., the array has more elements than this set), the element in
-		 * the array immediately following the end of the set is set to
-		 * <tt>null</tt>.  (This is useful in determining the length of this
-		 * set <i>only</i> if the caller knows that this set does not contain
-		 * any null elements.)
-		 * <p>
-		 * <p>If this set makes any guarantees as to what order its elements
-		 * are returned by its iterator, this method must return the elements
-		 * in the same order.
-		 * <p>
-		 * <p>Like the {@link #toArray()} method, this method acts as bridge between
-		 * array-based and collection-based APIs.  Further, this method allows
-		 * precise control over the runtime type of the output array, and may,
-		 * under certain circumstances, be used to save allocation costs.
-		 * <p>
-		 * <p>Suppose <tt>x</tt> is a set known to contain only strings.
-		 * The following code can be used to dump the set into a newly allocated
-		 * array of <tt>String</tt>:
-		 * <p>
-		 * <pre>
-		 *     String[] y = x.toArray(new String[0]);</pre>
-		 * <p>
-		 * Note that <tt>toArray(new Object[0])</tt> is identical in function to
-		 * <tt>toArray()</tt>.
-		 *
-		 * @param a the array into which the elements of this set are to be
-		 *          stored, if it is big enough; otherwise, a new array of the same
-		 *          runtime type is allocated for this purpose.
-		 * @return an array containing all the elements in this set
-		 * @throws ArrayStoreException  if the runtime type of the specified array
-		 *                              is not a supertype of the runtime type of every element in this
-		 *                              set
-		 * @throws NullPointerException if the specified array is null
-		 */
-		@Override public <T> T[] toArray(T[] a)
-		{
-			if (a == null)
-				throw new NullPointerException("Array cannot be null.");
-
-			int size = size();
-			T[] r = a.length >= size ? a :
-					(T[]) java.lang.reflect.Array
-							.newInstance(a.getClass().getComponentType(), size);
-			KeyIterator it = iterator();
-
-			int nextIndex = 0;
-			while (it.hasNext()) {
-				r[nextIndex] = (T) it.next();
-				nextIndex++;
-			}
-
-			return r;
-		}
-
-		/**
-		 * Not supported.
-		 *
-		 * @throws UnsupportedOperationException Since the method us not
-		 *                                       supported.
-		 */
-		@Override public boolean add(K k)
-		{
-			throw new UnsupportedOperationException();
 		}
 
 		/**
@@ -1419,13 +1364,12 @@ public class HashMap<K, V> implements Map<K, V>
 		 * call returns.)
 		 *
 		 * @param o object to be removed from this set, if present
+		 *
 		 * @return <tt>true</tt> if this set contained the specified element
-		 * @throws NullPointerException When the specified object is
-		 *                              null.
 		 */
 		@Override public boolean remove(Object o)
 		{
-			return HashMap.this.remove(o) != null ? true : false;
+			return removeNode(hash(o), o) != null;
 		}
 
 		/**
@@ -1434,40 +1378,28 @@ public class HashMap<K, V> implements Map<K, V>
 		 * method returns <tt>true</tt> if it is a <i>subset</i> of this set.
 		 *
 		 * @param c collection to be checked for containment in this set
+		 *
 		 * @return <tt>true</tt> if this set contains all of the elements of the
 		 * specified collection
-		 * @throws NullPointerException When encountering a null element in the provided collection.
 		 * @see #contains(Object)
 		 */
 		@Override public boolean containsAll(Collection<?> c)
 		{
-			if (c == null)
-				throw new NullPointerException();
+			if (c != null) {
+				for (int x = 0; x < buckets.length; x++) {
+					Node<K, V> current = buckets[x];
+					while (current != null) {
+						if (!c.contains(current.key)) {
+							return false;
+						}
 
-			for (int x = 0; x < buckets.length; x++) {
-				Pair<K, V> current = buckets[x];
-				while (current != null) {
-					if (!c.contains(current.key)) {
-						return false;
+						current = current.next;
 					}
-
-					current = current.next;
 				}
 			}
 
 			return true;
 		}
-
-		/**
-		 * Unsupported operation.
-		 *
-		 * @throws UnsupportedOperationException
-		 */
-		@Override public boolean addAll(Collection<? extends K> c)
-		{
-			throw new UnsupportedOperationException();
-		}
-
 
 		/**
 		 * Retains only the elements in this set that are contained in the
@@ -1478,21 +1410,21 @@ public class HashMap<K, V> implements Map<K, V>
 		 * <i>intersection</i> of the two sets.
 		 *
 		 * @param c collection containing elements to be retained in this set
+		 *
 		 * @return <tt>true</tt> if this set changed as a result of the call
-		 * @throws NullPointerException If the collection c is
-		 *                              <code>null</code>.
 		 * @see #remove(Object)
 		 */
 		@Override public boolean retainAll(Collection<?> c)
 		{
-			if (c == null)
-				throw new NullPointerException();
+			if (c == null) {
+				clear();
+				return true;
+			}
 
 			boolean changed = false;
-
 			for (int x = 0; x < buckets.length; x++) {
-				Pair<K, V> current  = buckets[x];
-				Pair<K, V> previous = null;
+				Node<K, V> current  = buckets[x];
+				Node<K, V> previous = null;
 				while (current != null) {
 					if (!c.contains(current.key)) {
 						if (previous != null)
@@ -1519,14 +1451,17 @@ public class HashMap<K, V> implements Map<K, V>
 		 * the two sets.
 		 *
 		 * @param c collection containing elements to be removed from this set
+		 *
 		 * @return <tt>true</tt> if this set changed as a result of the call
-		 * @throws NullPointerException When the provided collection
-		 *                              c is null.
 		 * @see #remove(Object)
 		 * @see #contains(Object)
 		 */
 		@Override public boolean removeAll(Collection<?> c)
 		{
+			if (c == null) {
+				return false;
+			}
+
 			boolean changed = false;
 			for (Object o : c) {
 				if (remove(o)) {
@@ -1544,6 +1479,30 @@ public class HashMap<K, V> implements Map<K, V>
 		@Override public void clear()
 		{
 			HashMap.this.clear();
+		}
+
+		/**
+		 * Unsupported operation.
+		 */
+		@Override public boolean addAll(Collection<? extends K> c)
+		{
+			throw new UnsupportedOperationException();
+		}
+
+		/**
+		 * Unsupported operation.
+		 */
+		@Override public <T> T[] toArray(T[] a)
+		{
+			throw new UnsupportedOperationException();
+		}
+
+		/**
+		 * Unsupported operation.
+		 */
+		@Override public boolean add(K k)
+		{
+			throw new UnsupportedOperationException();
 		}
 	}
 }
