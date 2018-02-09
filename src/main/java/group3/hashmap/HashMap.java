@@ -599,7 +599,7 @@ public class HashMap<K, V> implements Map<K, V>
 		Node<K, V> current     = buckets[bucketIndex];
 
 		while (current != null) {
-			if (current.key == key || current.key.equals(key)) {
+			if (key == null ? key == current.key : current.key.equals(key)) {
 				return current;
 			}
 
@@ -630,16 +630,13 @@ public class HashMap<K, V> implements Map<K, V>
 	 */
 	private Node<K, V> findPair(int hash, Object key, Object value)
 	{
-
 		int        bucketIndex = Math.abs(hash) % buckets.length;
 		Node<K, V> current     = buckets[bucketIndex];
 
 		while (current != null) {
-			if ((current.key == key || (current.hash == hash && current.key.equals(key))) &&
-				(value == current.value || (value == null || value.equals(current.value)))) {
-				if (value == null || value.equals(current.value)) {
-					return current;
-				}
+			if (key == null ? key == current.key : current.key.equals(key) &&
+												   (value == null ? value == current.value : value.equals(current.value))) {
+				return current;
 			}
 
 			current = current.next;
@@ -663,7 +660,8 @@ public class HashMap<K, V> implements Map<K, V>
 				if (++count >= size)
 					break Outer;
 				placeNode(newArray, current.hash, current.key, current.value,
-						  null); // Should reuse node
+						  null
+				); // Should reuse node
 				current = current.next;
 			}
 		}
