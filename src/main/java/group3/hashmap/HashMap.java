@@ -515,7 +515,7 @@ public class HashMap<K, V> implements Map<K, V>
 	 */
 	private V placeNode(Node<K, V>[] storage, int hashCode, K key, V value, Node<K, V> node)
 	{
-		int        bucketIndex = hashCode % storage.length;
+		int        bucketIndex = Math.abs(hashCode) % storage.length;
 		Node<K, V> head        = storage[bucketIndex];
 
 		if (head == null) {
