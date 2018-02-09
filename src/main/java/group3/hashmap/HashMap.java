@@ -561,7 +561,7 @@ public class HashMap<K, V> implements Map<K, V>
 	 */
 	private Node<K, V> removeNode(int hash, Object key)
 	{
-		int        bucketIndex = hash % buckets.length;
+		int        bucketIndex = Math.abs(hash) % buckets.length;
 		Node<K, V> head        = buckets[bucketIndex];
 
 		Node<K, V> previous = null;
@@ -607,7 +607,7 @@ public class HashMap<K, V> implements Map<K, V>
 	private Node<K, V> findPair(int hash, Object key)
 	{
 
-		int        bucketIndex = hash % buckets.length;
+		int        bucketIndex = Math.abs(hash) % buckets.length;
 		Node<K, V> current     = buckets[bucketIndex];
 
 		while (current != null) {
@@ -644,7 +644,7 @@ public class HashMap<K, V> implements Map<K, V>
 	private Node<K, V> findPair(int hash, Object key, Object value)
 	{
 
-		int        bucketIndex = hash % buckets.length;
+		int        bucketIndex = Math.abs(hash) % buckets.length;
 		Node<K, V> current     = buckets[bucketIndex];
 
 		while (current != null) {
