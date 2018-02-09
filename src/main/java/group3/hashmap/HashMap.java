@@ -255,7 +255,7 @@ public class HashMap<K, V> implements Map<K, V>
 	 */
 	@Override public boolean containsKey(Object key)
 	{
-		Node<K, V> node = findPair(hash(key), key);
+		Node<K, V> node = findNode(hash(key), key);
 
 		return node != null;
 	}
@@ -306,7 +306,7 @@ public class HashMap<K, V> implements Map<K, V>
 	 */
 	@Override public V get(Object key)
 	{
-		Node<K, V> node = findPair(hash(key), key);
+		Node<K, V> node = findNode(hash(key), key);
 
 		return node == null ? null : node.value;
 	}
@@ -475,16 +475,16 @@ public class HashMap<K, V> implements Map<K, V>
 	 * <code>node</code> into a bucket in <code>this.buckets</code>. The internal storage of the {@link HashMap}
 	 * might then be expanded.
 	 *
-	 * @param hashCode The hashCode of the node.
-	 * @param key      The key of the node.
-	 * @param value    The value of the node.
-	 * @param node     An existing {@link Node} instance. Can be provided so the method doesn't need to create a new
-	 *                 instance. A new instance will only be created if this argument is <code>null</code>.
+	 * @param hash  The hashCode of the node.
+	 * @param key   The key of the node.
+	 * @param value The value of the node.
+	 * @param node  An existing {@link Node} instance. Can be provided so the method doesn't need to create a new
+	 *              instance. A new instance will only be created if this argument is <code>null</code>.
 	 * @return The value that was replaced. Returns <code>null</code> if no value was replaced.
 	 */
-	private V placeNodeThis(int hashCode, K key, V value, Node<K, V> node)
+	private V placeNodeThis(int hash, K key, V value, Node<K, V> node)
 	{
-		V replace = placeNode(buckets, hashCode, key, value, node);
+		V replace = placeNode(buckets, hash, key, value, node);
 		if (replace == null)
 			size++;
 		if (needsExpansion(buckets, size))
@@ -498,25 +498,25 @@ public class HashMap<K, V> implements Map<K, V>
 	 * <code>node</code> into a bucket in the provided <code>storage</code>. The storage cannot be expanded by this
 	 * method.
 	 *
-	 * @param storage  The storage where the buckets are stored.
-	 * @param hashCode The hashCode of the node.
-	 * @param key      The key of the node.
-	 * @param value    The value of the node.
-	 * @param node     An existing {@link Node} instance. Can be provided so the method doesn't need to create a new
-	 *                 instance. A new instance will only be created if this argument is <code>null</code>.
+	 * @param storage The storage where the buckets are stored.
+	 * @param hash    The hashCode of the node.
+	 * @param key     The key of the node.
+	 * @param value   The value of the node.
+	 * @param node    An existing {@link Node} instance. Can be provided so the method doesn't need to create a new
+	 *                instance. A new instance will only be created if this argument is <code>null</code>.
 	 * @return The value that was replaced. Returns <code>null</code> if no value was replaced.
 	 */
-	private V placeNode(Node<K, V>[] storage, int hashCode, K key, V value, Node<K, V> node)
+	private V placeNode(Node<K, V>[] storage, int hash, K key, V value, Node<K, V> node)
 	{
-		int        bucketIndex = Math.abs(hashCode) % storage.length;
+		int        bucketIndex = index(hash, storage.length);
 		Node<K, V> head        = storage[bucketIndex];
 
 		if (head == null) {
-			storage[bucketIndex] = node == null ? new Node<>(hashCode, key, value, null) : node;
+			storage[bucketIndex] = node == null ? new Node<>(hash, key, value, null) : node;
 			return null;
 		}
 
-		if (key == null ? key == head.key : head.key.equals(key)) {
+		if (matches(hash, key, head.hash, head.key)) {
 			V before = head.getValue();
 			head.setValue(value);
 			return before;
@@ -528,11 +528,11 @@ public class HashMap<K, V> implements Map<K, V>
 		while (true) {
 
 			if (current == null) {
-				previous.setNext(node == null ? new Node<>(hashCode, key, value, null) : node);
+				previous.setNext(node == null ? new Node<>(hash, key, value, null) : node);
 				return null;
 			}
 
-			if (key == null ? key == head.key : head.key.equals(key)) {
+			if (matches(hash, key, current.hash, current.key)) {
 				current.setValue(value);
 				return current.value;
 			}
@@ -551,7 +551,7 @@ public class HashMap<K, V> implements Map<K, V>
 	 */
 	private Node<K, V> removeNode(int hash, Object key)
 	{
-		int        bucketIndex = Math.abs(hash) % buckets.length;
+		int        bucketIndex = index(hash, buckets.length);
 		Node<K, V> head        = buckets[bucketIndex];
 
 		Node<K, V> previous = null;
@@ -575,31 +575,20 @@ public class HashMap<K, V> implements Map<K, V>
 	}
 
 	/**
-	 * Removes the provided {@link Node} from the {@link HashMap}.
-	 *
-	 * @param node The {@link Node} to remove from the {@link HashMap}.
-	 * @return The removed {@link Node}. Returns <code>null</code> if no {@link Node} was removed.
-	 */
-	private Node<K, V> removeNode(Node<K, V> node)
-	{
-		return removeNode(node.hash, node.key);
-	}
-
-	/**
 	 * Finds the node matching the provided hash and key.
 	 *
 	 * @param hash The hash to find the matching node from.
 	 * @param key  The key to find the matching node from.
 	 * @return The matching node. Returns null if no node could be found.
 	 */
-	private Node<K, V> findPair(int hash, Object key)
+	private Node<K, V> findNode(int hash, Object key)
 	{
 
-		int        bucketIndex = Math.abs(hash) % buckets.length;
+		int        bucketIndex = index(hash, buckets.length);
 		Node<K, V> current     = buckets[bucketIndex];
 
 		while (current != null) {
-			if (key == null ? key == current.key : current.key.equals(key)) {
+			if (matches(hash, key, current.hash, current.key)) {
 				return current;
 			}
 
@@ -617,7 +606,7 @@ public class HashMap<K, V> implements Map<K, V>
 
 		Map.Entry e   = (Map.Entry) o;
 		Object    key = e.getKey();
-		return findPair(hash(key), key, e.getValue());
+		return findNode(hash(key), key, e.getValue());
 	}
 
 	/**
@@ -628,14 +617,13 @@ public class HashMap<K, V> implements Map<K, V>
 	 * @param value An optional value that the matching <code>node</code> must also match.
 	 * @return The matching node. Returns null if no node could be found.
 	 */
-	private Node<K, V> findPair(int hash, Object key, Object value)
+	private Node<K, V> findNode(int hash, Object key, Object value)
 	{
-		int        bucketIndex = Math.abs(hash) % buckets.length;
+		int        bucketIndex = index(hash, buckets.length);
 		Node<K, V> current     = buckets[bucketIndex];
 
 		while (current != null) {
-			if (key == null ? key == current.key : current.key.equals(key) &&
-												   (value == null ? value == current.value : value.equals(current.value))) {
+			if (matches(hash, key, current.hash, current.key) && (value == null ? value == current.value : value.equals(current.value))) {
 				return current;
 			}
 
@@ -643,6 +631,18 @@ public class HashMap<K, V> implements Map<K, V>
 		}
 
 		return null;
+	}
+
+	/**
+	 * Returns the bucket index that the provided hash should be contained in.
+	 *
+	 * @param hash     The hash that the bucket index should be found from.
+	 * @param capacity The capacity of the bucket array.
+	 * @return The bucket index.
+	 */
+	private int index(int hash, int capacity)
+	{
+		return Math.abs(hash) % capacity;
 	}
 
 	/**
@@ -656,13 +656,15 @@ public class HashMap<K, V> implements Map<K, V>
 		Outer:
 		for (Node<K, V> head : buckets) {
 			Node<K, V> current = head;
+			Node<K, V> previous;
 			while (current != null) {
 				if (++count >= size)
 					break Outer;
-				placeNode(newArray, current.hash, current.key, current.value,
-						  null
-				); // Should reuse node
-				current = current.next;
+				placeNode(newArray, current.hash, current.key, current.value, current);
+
+				previous = current;
+				current = previous.next;
+				previous.next = null;
 			}
 		}
 
@@ -681,7 +683,22 @@ public class HashMap<K, V> implements Map<K, V>
 	 */
 	private boolean matches(Node<K, V> node, int hash, Object key)
 	{
-		return node.key == key || node.hash == hash;
+		return node.key == key && node.hash == hash;
+	}
+
+	/**
+	 * Checks if the provided <code>hashA</code> and <code>keyA</code> matches the provided <code>hashB</code> and
+	 * <code>keyB</code>. The arguments match when <code>keyA == null ? keyA == keyB : keyA.equals(keyB)</code>.
+	 *
+	 * @param hashA The first hash.
+	 * @param keyA  The first key.
+	 * @param hashB The second hash.
+	 * @param keyB  The second key.
+	 * @return True when the arguments match.
+	 */
+	private boolean matches(int hashA, Object keyA, int hashB, Object keyB)
+	{
+		return hashA == hashB && (keyA == null ? keyA == keyB : keyA.equals(keyB));
 	}
 
 	/**
@@ -1235,7 +1252,7 @@ public class HashMap<K, V> implements Map<K, V>
 		 */
 		@Override public boolean contains(Object o)
 		{
-			return findPair(hash(o), o) != null;
+			return findNode(hash(o), o) != null;
 		}
 
 		/**

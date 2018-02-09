@@ -34,7 +34,6 @@ public class HashMapTest
 		assertEquals(2, map.size());
 	}
 
-
 	@Test
 	public void isEmpty() throws Exception
 	{
