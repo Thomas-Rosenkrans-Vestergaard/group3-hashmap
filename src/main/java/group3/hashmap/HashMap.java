@@ -662,8 +662,8 @@ public class HashMap<K, V> implements Map<K, V>
 			while (current != null) {
 				if (++count >= size)
 					break Outer;
-				current.next = null;
-				placeNode(newArray, current.hash, current.key, current.value, current);
+				placeNode(newArray, current.hash, current.key, current.value,
+						  null); // Should reuse node
 				current = current.next;
 			}
 		}
@@ -694,8 +694,7 @@ public class HashMap<K, V> implements Map<K, V>
 	 */
 	private int hash(Object key)
 	{
-		int h;
-		return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
+		return key == null ? 0 : key.hashCode();
 	}
 
 	/**

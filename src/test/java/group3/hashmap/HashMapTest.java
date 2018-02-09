@@ -544,8 +544,8 @@ public class HashMapTest
 			Integer[] array = set.toArray(new Integer[2]);
 
 			assertEquals(2, array.length);
-			assertEquals((Object)0, array[0]);
-			assertEquals((Object)1, array[1]);
+			assertEquals((Object) 0, array[0]);
+			assertEquals((Object) 1, array[1]);
 		}
 
 		@Test
