@@ -485,7 +485,8 @@ public class HashMap<K, V> implements Map<K, V>
 	 * @param key   The key of the node.
 	 * @param value The value of the node.
 	 * @param node  An existing {@link Node} instance. Can be provided so the method doesn't need to create a new
-	 *              instance. A new instance will only be created if this argument is <code>null</code>.
+	 *              instance. A new instance will only be created if this argument is <code>null</code>. The
+	 *              <code>next</code> reference is always removed.
 	 *
 	 * @return The value that was replaced. Returns <code>null</code> if no value was replaced.
 	 */
@@ -493,6 +494,10 @@ public class HashMap<K, V> implements Map<K, V>
 	{
 		int        bucketIndex = index(hash, buckets.length);
 		Node<K, V> head        = buckets[bucketIndex];
+
+		if (node != null) {
+			node.next = null;
+		}
 
 		if (head == null) {
 			buckets[bucketIndex] = node == null ? new Node<>(hash, key, value, null) : node;
@@ -650,12 +655,10 @@ public class HashMap<K, V> implements Map<K, V>
 
 		for (Node<K, V> head : before) {
 			Node<K, V> current = head;
-			Node<K, V> previous;
 			while (current != null) {
+				Node<K, V> next = current.next;
 				putNode(current.hash, current.key, current.value, current);
-				previous = current;
-				current = previous.next;
-				previous.next = null;
+				current = next;
 			}
 		}
 	}
