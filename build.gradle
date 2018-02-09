@@ -2,11 +2,19 @@ group 'group3'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'java-library'
 
 sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'group3.hashmap.HashMap'
+    }
 }
 
 dependencies {
