@@ -23,6 +23,54 @@ public class HashMapTest
 	}
 
 	@Test
+	public void constructorCapacity() throws Exception
+	{
+		assertEquals(16, map.capacity());
+		map = new HashMap<>(20);
+		assertEquals(20, map.capacity());
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void constructorCapacityThrowsIllegalArgumentException() throws Exception
+	{
+		map = new HashMap<>(1);
+	}
+
+	@Test
+	public void constructorLoadFactor() throws Exception
+	{
+		assertEquals(0.75, map.getLoadFactor(), 0.0001);
+		map = new HashMap<>(0.80);
+		assertEquals(0.80, map.getLoadFactor(), 0.0001);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void constructorLoadFactorThrowsIllegalArgumentExceptionLowerBound() throws Exception
+	{
+		map = new HashMap<>(0.0);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void constructorLoadFactorThrowsIllegalArgumentExceptionUpperBound() throws Exception
+	{
+		map = new HashMap<>(1.00001);
+	}
+
+	@Test
+	public void constructorMap() throws Exception
+	{
+		Map<Integer, Integer> parameter = new java.util.HashMap<>();
+		parameter.put(0, 0);
+		parameter.put(1, 1);
+		parameter.put(2, 2);
+
+		map = new HashMap<>(parameter);
+		assertTrue(map.containsKey(0));
+		assertTrue(map.containsKey(1));
+		assertTrue(map.containsKey(2));
+	}
+
+	@Test
 	public void size() throws Exception
 	{
 		assertEquals(0, map.size());
@@ -40,30 +88,45 @@ public class HashMapTest
 		assertTrue(map.isEmpty());
 		map.put(0, 0);
 		assertFalse(map.isEmpty());
+		map.clear();
+		assertTrue(map.isEmpty());
 	}
 
 	@Test
 	public void containsKey() throws Exception
 	{
 		assertFalse(map.containsKey(0));
+		assertFalse(map.containsKey(null));
 		map.put(0, 0);
+		map.put(null, 1);
 		assertTrue(map.containsKey(0));
+		assertTrue(map.containsKey(null));
+		map.remove(0);
+		map.remove(null);
+		assertFalse(map.containsKey(0));
+		assertFalse(map.containsKey(null));
 	}
 
 	@Test
 	public void containsValue() throws Exception
 	{
 		assertFalse(map.containsValue(1));
+		assertFalse(map.containsValue(null));
 		map.put(0, 1);
+		map.put(1, null);
 		assertTrue(map.containsValue(1));
+		assertTrue(map.containsValue(null));
 		map.remove(0);
+		map.remove(1);
 		assertFalse(map.containsValue(1));
+		assertFalse(map.containsValue(null));
 	}
 
 	@Test
 	public void get() throws Exception
 	{
 		assertNull(map.get(0));
+		assertNull(map.get(null));
 		map.put(0, 15);
 		map.put(null, 30);
 		assertEquals(15, (long) map.get(0));
@@ -74,13 +137,16 @@ public class HashMapTest
 	public void put() throws Exception
 	{
 		assertFalse(map.containsKey(0));
-		map.put(0, 156);
-		map.put(null, 30);
+		assertFalse(map.containsKey(null));
+		map.put(0, 1);
+		map.put(null, 1);
 		assertTrue(map.containsKey(0));
-		assertEquals(156, (long) map.get(0));
-		assertEquals(156, (long) map.put(0, 200));
-		assertEquals(30, (long) map.get(null));
-		assertEquals(2, map.size()); // Can override values
+		assertTrue(map.containsKey(null));
+
+		assertEquals(1, (long) map.put(0, 200));
+		assertEquals(1, (long) map.put(null, 200));
+		assertEquals(200, (long) map.get(0));
+		assertEquals(200, (long) map.get(null));
 	}
 
 	@Test
@@ -88,10 +154,10 @@ public class HashMapTest
 	{
 		map.put(0, 250);
 		map.put(null, 32);
-		assertFalse(map.isEmpty());
+		assertTrue(map.containsKey(0));
+		assertTrue(map.containsKey(null));
 		assertEquals(250, (long) map.remove(0));
 		assertEquals(32, (long) map.remove(null));
-		assertTrue(map.isEmpty());
 	}
 
 	@Test
@@ -102,17 +168,10 @@ public class HashMapTest
 		parameter.put(1, 1);
 		parameter.put(2, 2);
 
+		map.putAll(null);
 		assertEquals(0, map.size());
 		map.putAll(parameter);
 		assertEquals(3, map.size());
-	}
-
-	@Test
-	public void putAllNull() throws Exception
-	{
-		assertTrue(map.isEmpty());
-		map.putAll(null);
-		assertTrue(map.isEmpty());
 	}
 
 	@Test
@@ -120,14 +179,11 @@ public class HashMapTest
 	{
 		map.put(0, 0);
 		map.put(1, 1);
-
-		assertFalse(map.isEmpty());
-		assertEquals(2, map.size());
-
+		assertTrue(map.containsKey(0));
+		assertTrue(map.containsKey(1));
 		map.clear();
-
-		assertTrue(map.isEmpty());
-		assertEquals(0, map.size());
+		assertFalse(map.containsKey(0));
+		assertFalse(map.containsKey(1));
 	}
 
 	@Test
@@ -136,14 +192,230 @@ public class HashMapTest
 		map.put(0, 0);
 		map.put(1, 1);
 		map.put(2, 2);
-		map.put(9, 9);
 
 		Collection<Integer> values = map.values();
 
 		assertTrue(values.contains(0));
 		assertTrue(values.contains(1));
 		assertTrue(values.contains(2));
-		assertTrue(values.contains(9));
+	}
+
+	public static class HashMapValuesTest
+	{
+
+		private HashMap<Integer, Integer> map;
+		private Collection<Integer>       values;
+
+		@Before
+		public void setUp()
+		{
+			map = new HashMap<>();
+			values = map.values();
+		}
+
+		@Test
+		public void size() throws Exception
+		{
+			assertEquals(0, values.size());
+			map.put(0, 0);
+			assertEquals(1, values.size());
+			map.remove(0);
+			assertEquals(0, values.size());
+		}
+
+		@Test
+		public void isEmpty() throws Exception
+		{
+			assertTrue(values.isEmpty());
+			map.put(0, 0);
+			assertFalse(values.isEmpty());
+			map.remove(0);
+			assertTrue(values.isEmpty());
+		}
+
+		@Test
+		public void contains() throws Exception
+		{
+			assertFalse(values.contains(5));
+			map.put(0, 5);
+			assertTrue(values.contains(5));
+			map.remove(0);
+			assertFalse(values.contains(5));
+		}
+
+		@Test
+		public void iterator() throws Exception
+		{
+			Set<Integer> set = new HashSet<>();
+
+			for (int x = 0; x < 1000; x++) {
+				set.add(x);
+				map.put(x, x);
+			}
+
+			Iterator<Integer> it = values.iterator();
+			while (it.hasNext()) {
+				int n = it.next();
+				assertTrue(set.contains(n));
+			}
+
+			assertFalse(it.hasNext());
+		}
+
+		@Test
+		public void toArray() throws Exception
+		{
+			int sum = 10;
+
+			map.put(0, 0);
+			map.put(1, 1);
+			map.put(2, 2);
+			map.put(3, 3);
+			map.put(4, 4);
+
+			Object[] array = values.toArray();
+			assertEquals(5, array.length);
+			for (Object o : array) {
+				Integer i = (Integer) o;
+				sum -= i;
+			}
+
+			assertEquals(0, sum);
+		}
+
+		@Test
+		public void toArrayArgument() throws Exception
+		{
+			int sum = 20;
+
+			map.put(0, 0);
+			map.put(1, 1);
+			map.put(2, 2);
+			map.put(3, 3);
+			map.put(4, 4);
+
+			Integer[] array = values.toArray(new Integer[0]);
+			assertEquals(5, array.length);
+			for (Object o : array) {
+				Integer i = (Integer) o;
+				sum -= i;
+			}
+
+			assertEquals(10, sum);
+
+			array = values.toArray(new Integer[5]);
+			assertEquals(5, array.length);
+			for (Object o : array) {
+				Integer i = (Integer) o;
+				sum -= i;
+			}
+
+			assertEquals(0, sum);
+		}
+
+		@Test
+		public void remove() throws Exception
+		{
+			map.put(0, 0);
+			map.put(1, null);
+			assertTrue(values.contains(0));
+			assertTrue(values.contains(null));
+			values.remove(0);
+			values.remove(null);
+			assertFalse(values.contains(0));
+			assertFalse(values.contains(null));
+		}
+
+		@Test
+		public void containsAll() throws Exception
+		{
+			assertFalse(values.containsAll(null));
+			assertFalse(values.containsAll(new ArrayList<>()));
+
+			map.put(0, 0);
+			map.put(1, 1);
+
+			Collection<Integer> c = new ArrayList<>();
+
+			assertFalse(values.containsAll(c));
+
+			c.add(0);
+			c.add(1);
+
+			assertTrue(values.containsAll(c));
+		}
+
+		@Test(expected = UnsupportedOperationException.class)
+		public void add() throws Exception
+		{
+			values.add(5);
+		}
+
+		@Test(expected = UnsupportedOperationException.class)
+		public void addAll() throws Exception
+		{
+			values.add(5);
+		}
+
+		@Test
+		public void removeAll() throws Exception
+		{
+			assertFalse(values.removeAll(null));
+			assertFalse(values.removeAll(new ArrayList<>()));
+
+			map.put(0, 0);
+			map.put(1, 1);
+			map.put(2, 2);
+
+			Collection<Integer> integers = new ArrayList<>();
+			integers.add(0);
+
+			assertTrue(values.removeAll(integers));
+
+			integers.add(1);
+			integers.add(2);
+
+			assertTrue(values.removeAll(integers));
+			assertFalse(values.removeAll(integers));
+		}
+
+		@Test
+		public void retainAll() throws Exception
+		{
+			assertFalse(values.retainAll(null));
+			assertFalse(values.retainAll(new ArrayList<>()));
+
+			map.put(0, 0);
+			map.put(1, 1);
+			map.put(2, 2);
+
+			assertTrue(map.containsValue(0));
+			assertTrue(map.containsValue(1));
+			assertTrue(map.containsValue(2));
+
+			Collection<Integer> integers = new ArrayList<>();
+			integers.add(0);
+
+			assertTrue(values.retainAll(integers));
+
+			assertTrue(map.containsValue(0));
+			assertFalse(map.containsValue(1));
+			assertFalse(map.containsValue(2));
+		}
+
+		@Test
+		public void clear() throws Exception
+		{
+			map.put(0, 0);
+			map.put(1, 1);
+			map.put(2, 2);
+
+			assertFalse(values.isEmpty());
+
+			values.clear();
+
+			assertTrue(values.isEmpty());
+		}
 	}
 
 	@Test
