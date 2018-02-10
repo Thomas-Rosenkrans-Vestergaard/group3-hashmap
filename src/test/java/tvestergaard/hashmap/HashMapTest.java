@@ -7,7 +7,6 @@ import org.junit.runner.RunWith;
 
 import java.util.*;
 import java.util.Map.Entry;
-import tvestergaard.hashmap.HashMap;
 
 import static org.junit.Assert.*;
 
@@ -112,7 +111,7 @@ public class HashMapTest
 	public void putAllNull() throws Exception
 	{
 		assertTrue(map.isEmpty());
-		map.putAll(new java.util.HashMap<>());
+		map.putAll(null);
 		assertTrue(map.isEmpty());
 	}
 
@@ -203,8 +202,8 @@ public class HashMapTest
 	public static class NodeSetTest
 	{
 
-		private HashMap<Integer, Integer> map;
-		private Set<Map.Entry<Integer, Integer>>               set;
+		private HashMap<Integer, Integer>        map;
+		private Set<Map.Entry<Integer, Integer>> set;
 
 		private HashMap.Node<Integer, Integer> pair(Integer key, Integer value)
 		{
@@ -309,7 +308,8 @@ public class HashMapTest
 			set.add(pair(0, 0));
 			map.put(1, 1);
 
-			HashMap.Node<Integer, Integer>[] array = set.toArray((HashMap.Node<Integer, Integer>[]) new HashMap.Node[0]);
+			HashMap.Node<Integer, Integer>[] array = set.toArray((HashMap.Node<Integer, Integer>[]) new HashMap
+					.Node[0]);
 
 			assertEquals(2, array.length);
 			assertEquals(pair(0, 0), array[0]);
@@ -455,7 +455,7 @@ public class HashMapTest
 	{
 
 		private HashMap<Integer, Integer> map;
-		private Set<Integer>                                   set;
+		private Set<Integer>              set;
 
 		@Before
 		public void setUp()
