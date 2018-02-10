@@ -1179,9 +1179,9 @@ public class HashMap<K, V> implements Map<K, V>
 
 		/**
 		 * Removes the specified element from this set if it is present. More formally, removes an element <tt>e</tt>
-		 * such that <tt>(o==null&nbsp;?&nbsp;e==null&nbsp;:&nbsp;o.equals(e))</tt>, if this set contains such an
+		 * such that <tt>(o==null ? e==null : o.equals(e))</tt>, if this set contains such an
 		 * element.  Returns <tt>true</tt> if this set contained the element (or equivalently, if this set changed as a
-		 * result of the call).  (This set will not contain the element once the call returns.)
+		 * result of the call).
 		 *
 		 * @param o object to be removed from this set, if present
 		 *
@@ -1483,7 +1483,7 @@ public class HashMap<K, V> implements Map<K, V>
 
 		/**
 		 * Removes the specified element from this set if it is present More formally, removes an element <tt>e</tt>
-		 * such that <tt>(o==null&nbsp;?&nbsp;e==null&nbsp;:&nbsp;o.equals(e))</tt>, if this set contains such an
+		 * such that <tt>(o==null ? e==null : o.equals(e))</tt>, if this set contains such an
 		 * element.  Returns <tt>true</tt> if this set contained the element (or equivalently, if this set changed as a
 		 * result of the call).  (This set will not contain the element once the call returns.)
 		 *
