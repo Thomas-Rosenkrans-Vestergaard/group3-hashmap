@@ -1,4 +1,4 @@
-package group3.hashmap;
+package tvestergaard.hashmap;
 
 import java.util.*;
 
@@ -161,7 +161,7 @@ public class HashMap<K, V> implements Map<K, V>
 		 */
 		public Node(K key, V value)
 		{
-			this(key.hashCode(), key, value, null);
+			this(hash(key), key, value, null);
 		}
 
 		/**
@@ -699,7 +699,7 @@ public class HashMap<K, V> implements Map<K, V>
 	 *
 	 * @return The resulting hash.
 	 */
-	private int hash(Object key)
+	private static int hash(Object key)
 	{
 		return key == null ? 0 : key.hashCode();
 	}
@@ -967,7 +967,7 @@ public class HashMap<K, V> implements Map<K, V>
 		 */
 		@Override public boolean add(Map.Entry<K, V> entry)
 		{
-			if (entry == null || nodeFromEntry(entry) == null)
+			if (entry == null || nodeFromEntry(entry) != null)
 				return false;
 
 			K key = entry.getKey();
