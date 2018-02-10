@@ -486,13 +486,13 @@ public class HashMap<K, V> implements Map<K, V>
 	 * @param value The value of the node.
 	 * @param node  An existing {@link Node} instance. Can be provided so the method doesn't need to create a new
 	 *              instance. A new instance will only be created if this argument is <code>null</code>. The
-	 *              <code>next</code> reference is always removed.
+	 *              <code>node.next</code> reference is always removed.
 	 *
 	 * @return The value that was replaced. Returns <code>null</code> if no value was replaced.
 	 */
 	private V putNode(int hash, K key, V value, Node<K, V> node)
 	{
-		int        bucketIndex = index(hash, buckets.length);
+		int        bucketIndex = index(hash);
 		Node<K, V> head        = buckets[bucketIndex];
 
 		if (node != null) {
@@ -546,12 +546,11 @@ public class HashMap<K, V> implements Map<K, V>
 	 */
 	private Node<K, V> removeNode(int hash, Object key)
 	{
-		int        bucketIndex = index(hash, buckets.length);
+		int        bucketIndex = index(hash);
 		Node<K, V> head        = buckets[bucketIndex];
 
 		Node<K, V> previous = null;
 		Node<K, V> current  = head;
-
 		while (current != null) {
 			if (matches(current, hash, key)) {
 				if (previous != null)
@@ -580,9 +579,8 @@ public class HashMap<K, V> implements Map<K, V>
 	private Node<K, V> findNode(int hash, Object key)
 	{
 
-		int        bucketIndex = index(hash, buckets.length);
+		int        bucketIndex = index(hash);
 		Node<K, V> current     = buckets[bucketIndex];
-
 		while (current != null) {
 			if (matches(hash, key, current.hash, current.key)) {
 				return current;
@@ -594,7 +592,7 @@ public class HashMap<K, V> implements Map<K, V>
 		return null;
 	}
 
-	private Node<K, V> findFromEntry(Object o)
+	private Node<K, V> nodeFromEntry(Object o)
 	{
 		if (!(o instanceof Map.Entry)) {
 			return null;
@@ -616,7 +614,7 @@ public class HashMap<K, V> implements Map<K, V>
 	 */
 	private Node<K, V> findNode(int hash, Object key, Object value)
 	{
-		int        bucketIndex = index(hash, buckets.length);
+		int        bucketIndex = index(hash);
 		Node<K, V> current     = buckets[bucketIndex];
 
 		while (current != null) {
@@ -632,16 +630,15 @@ public class HashMap<K, V> implements Map<K, V>
 	}
 
 	/**
-	 * Returns the bucket index that the provided hash should be contained in.
+	 * Returns the bucket index assigned to the provided hash.
 	 *
-	 * @param hash     The hash that the bucket index should be found from.
-	 * @param capacity The capacity of the bucket array.
+	 * @param hash The hash that the bucket index should be placed in.
 	 *
 	 * @return The bucket index.
 	 */
-	private int index(int hash, int capacity)
+	private int index(int hash)
 	{
-		return Math.abs(hash) % capacity;
+		return Math.abs(hash) % buckets.length;
 	}
 
 	/**
@@ -771,15 +768,14 @@ public class HashMap<K, V> implements Map<K, V>
 		 */
 		@Override public boolean contains(Object o)
 		{
-			Node<K, V> found = findFromEntry(o);
+			Node<K, V> found = nodeFromEntry(o);
 
 			return found != null;
 		}
 
 		/**
 		 * Returns an iterator over the elements in this set.  The elements are
-		 * returned in no particular order (unless this set is an instance of some
-		 * class that provides a guarantee).
+		 * returned in no particular order.
 		 *
 		 * @return an iterator over the elements in this set
 		 */
@@ -884,20 +880,10 @@ public class HashMap<K, V> implements Map<K, V>
 		}
 
 		/**
-		 * Returns an array containing all of the elements in this set.
-		 * If this set makes any guarantees as to what order its elements
-		 * are returned by its iterator, this method must return the
-		 * elements in the same order.
-		 * <p>
-		 * <p>The returned array will be "safe" in that no references to it
-		 * are maintained by this set.  (In other words, this method must
-		 * allocate a new array even if this set is backed by an array).
-		 * The caller is thus free to modify the returned array.
-		 * <p>
-		 * <p>This method acts as bridge between array-based and collection-based
-		 * APIs.
+		 * Returns an array containing all of the elements in this set. The resulting array can be modified without
+		 * affecting the set.
 		 *
-		 * @return an array containing all the elements in this set
+		 * @return the array containing all the elements in this set
 		 */
 		@Override public Node<K, V>[] toArray()
 		{
@@ -931,10 +917,7 @@ public class HashMap<K, V> implements Map<K, V>
 		 * are returned by its iterator, this method must return the elements
 		 * in the same order.
 		 * <p>
-		 * <p>Like the {@link #toArray()} method, this method acts as bridge between
-		 * array-based and collection-based APIs.  Further, this method allows
-		 * precise control over the runtime type of the output array, and may,
-		 * under certain circumstances, be used to save allocation costs.
+		 * This method allows precise control over the runtime type of the output array.
 		 * <p>
 		 * <p>Suppose <tt>x</tt> is a set known to contain only strings.
 		 * The following code can be used to dump the set into a newly allocated
@@ -943,8 +926,6 @@ public class HashMap<K, V> implements Map<K, V>
 		 * <pre>
 		 *     String[] y = x.toArray(new String[0]);</pre>
 		 * <p>
-		 * Note that <tt>toArray(new Object[0])</tt> is identical in function to
-		 * <tt>toArray()</tt>.
 		 *
 		 * @param a the array into which the elements of this set are to be
 		 *          stored, if it is big enough; otherwise, a new array of the same
@@ -975,22 +956,9 @@ public class HashMap<K, V> implements Map<K, V>
 		}
 
 		/**
-		 * Adds the specified element to this set if it is not already present
-		 * (optional operation).  More formally, adds the specified element
-		 * <tt>e</tt> to this set if the set contains no element <tt>e2</tt>
-		 * such that
-		 * <tt>(e==null&nbsp;?&nbsp;e2==null&nbsp;:&nbsp;e.equals(e2))</tt>.
-		 * If this set already contains the element, the call leaves the set
-		 * unchanged and returns <tt>false</tt>.  In combination with the
-		 * restriction on constructors, this ensures that sets never contain
-		 * duplicate elements.
-		 * <p>
-		 * <p>The stipulation above does not imply that sets must accept all
-		 * elements; sets may refuse to add any particular element, including
-		 * <tt>null</tt>, and throw an exception, as described in the
-		 * specification for {@link Collection#add Collection.add}.
-		 * Individual set implementations should clearly document any
-		 * restrictions on the elements that they may contain.
+		 * Adds the provided entry to the {@link NodeSet} when it does not already exist in the set. The entry is
+		 * only added when a {@link Node} with the an equal key and value doesn't exist in the set. Null values
+		 * cannot be allowed.
 		 *
 		 * @param entry element to be added to this set
 		 *
@@ -999,17 +967,8 @@ public class HashMap<K, V> implements Map<K, V>
 		 */
 		@Override public boolean add(Map.Entry<K, V> entry)
 		{
-			if (entry == null)
+			if (entry == null || nodeFromEntry(entry) == null)
 				return false;
-
-			for (Node<K, V> current : buckets) {
-				while (current != null) {
-					if (current.equals(entry))
-						return false;
-
-					current = current.next;
-				}
-			}
 
 			K key = entry.getKey();
 			putNode(key.hashCode(), key, entry.getValue(), null);

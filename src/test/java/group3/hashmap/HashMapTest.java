@@ -246,9 +246,13 @@ public class HashMapTest
 		public void contains()
 		{
 			assertFalse(set.contains(pair(0, 0)));
+			assertFalse(set.contains(pair(1, 1)));
 
 			map.put(0, 0);
 			set.add(pair(1, 1));
+
+			assertFalse(set.contains(pair(0, 1)));
+			assertFalse(set.contains(pair(1, 0)));
 
 			assertTrue(set.contains(pair(0, 0)));
 			assertTrue(set.contains(pair(1, 1)));
