@@ -331,9 +331,8 @@ public class HashMap<K, V> implements Map<K, V>
 	}
 
 	/**
-	 * Copies all of the mappings from the specified map to this map. These mappings will replace any mappings that
-	 * this
-	 * map had for any of the keys currently in the specified map.
+	 * Copies all of the mappings from the specified map to this map. These mappings will replace any mappings
+	 * that this map had for any of the keys currently in the specified map.
 	 *
 	 * @param m mappings to be stored in this map. No entries are added if the provided map is <code>null</code>.
 	 */
@@ -741,10 +740,10 @@ public class HashMap<K, V> implements Map<K, V>
 		}
 
 		/**
-		 * Removes from the underlying collection the last element returned by this iterator (optional operation). This
-		 * method can be called only once per call to {@link #next}.  The behavior of an iterator is unspecified if the
-		 * underlying collection is modified while the iteration is in progress in any way other than by calling this
-		 * method.
+		 * Removes from the underlying collection the last element returned by this iterator. This method can be called
+		 * only once per call to {@link #next}.  The behavior of an iterator is unspecified if the underlying
+		 * collection
+		 * is modified while the iteration is in progress in any way other than by calling this method.
 		 *
 		 * @throws IllegalStateException if the {@code next} method has not yet been called, or the {@code remove}
 		 *                               method has already been called after the last call to the {@code next} method
@@ -1178,9 +1177,9 @@ public class HashMap<K, V> implements Map<K, V>
 		}
 
 		/**
-		 * Adds the provided entry to the {@link HashMapEntrySet} when it does not already exist in the set. The entry is only
-		 * added when a {@link Node} with the an equal key and value doesn't exist in the set. Null values cannot be
-		 * allowed.
+		 * Adds the provided entry to the {@link HashMapEntrySet} when it does not already exist in the set. The entry
+		 * is only added when a {@link Node} with the an equal key and value doesn't exist in the set. Null values
+		 * cannot be allowed.
 		 *
 		 * @param entry element to be added to this set
 		 *
@@ -1263,10 +1262,10 @@ public class HashMap<K, V> implements Map<K, V>
 		}
 
 		/**
-		 * Adds all of the elements in the specified collection to this set if they're not already present (optional
-		 * operation).  If the specified collection is also a set, the <tt>addAll</tt> operation effectively modifies
-		 * this set so that its value is the <i>union</i> of the two sets.  The behavior of this operation is undefined
-		 * if the specified collection is modified while the operation is in progress.
+		 * Adds all of the elements in the specified collection to this set if they're not already present.  If the
+		 * specified collection is also a set, the <tt>addAll</tt> operation effectively modifies this set so that its
+		 * value is the <i>union</i> of the two sets.  The behavior of this operation is undefined if the specified
+		 * collection is modified while the operation is in progress.
 		 *
 		 * @param c collection containing elements to be added to this set
 		 *
@@ -1288,10 +1287,11 @@ public class HashMap<K, V> implements Map<K, V>
 		}
 
 		/**
-		 * Retains only the elements in this set that are contained in the specified collection (optional operation) .
-		 * In other words, removes from this set all of its elements that are not contained in the specified collection
-		 * . If the specified collection is also a set, this operation effectively modifies this set so that its value
-		 * is the <i>intersection</i> of the two sets.
+		 * Retains only the elements in this set that are contained in the specified collection. In other words,
+		 * removes
+		 * from this set all of its elements that are not contained in the specified collection . If the specified
+		 * collection is also a set, this operation effectively modifies this set so that its value is the
+		 * <i>intersection</i> of the two sets.
 		 *
 		 * @param c collection containing elements to be retained in this set
 		 *
@@ -1328,9 +1328,10 @@ public class HashMap<K, V> implements Map<K, V>
 		}
 
 		/**
-		 * Removes from this set all of its elements that are contained in the specified collection (optional
-		 * operation).  If the specified collection is also a set, this operation effectively modifies this set so that
-		 * its value is the <i>asymmetric set difference</i> of the two sets.
+		 * Removes from this set all of its elements that are contained in the specified collection.  If the specified
+		 * collection is also a set, this operation effectively modifies this set so that its value is the
+		 * <i>asymmetric
+		 * set difference</i> of the two sets.
 		 *
 		 * @param c collection containing elements to be removed from this set
 		 *
@@ -1355,8 +1356,7 @@ public class HashMap<K, V> implements Map<K, V>
 		}
 
 		/**
-		 * Removes all of the elements from this set (optional operation). The set will be empty after this call
-		 * returns.
+		 * Removes all of the elements from this set. The set will be empty after this call returns.
 		 */
 		@Override public void clear()
 		{
@@ -1608,8 +1608,7 @@ public class HashMap<K, V> implements Map<K, V>
 		}
 
 		/**
-		 * Removes all of the elements from this set (optional operation). The set will be empty after this call
-		 * returns.
+		 * Removes all of the elements from this set. The set will be empty after this call returns.
 		 */
 		@Override public void clear()
 		{
