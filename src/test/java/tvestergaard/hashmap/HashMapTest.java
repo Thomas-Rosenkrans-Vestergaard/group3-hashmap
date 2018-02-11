@@ -200,7 +200,7 @@ public class HashMapTest
 		assertTrue(values.contains(2));
 	}
 
-	public static class HashMapValuesTest
+	public static class HashMapValueCollectionTest
 	{
 
 		private HashMap<Integer, Integer> map;
@@ -243,23 +243,78 @@ public class HashMapTest
 			assertFalse(values.contains(5));
 		}
 
-		@Test
-		public void iterator() throws Exception
+		public static class HashMapValueCollectionTestTest
 		{
-			Set<Integer> set = new HashSet<>();
 
-			for (int x = 0; x < 1000; x++) {
-				set.add(x);
-				map.put(x, x);
+			private HashMap<Integer, Integer> map;
+			private Collection<Integer>       values;
+			private Iterator<Integer>         it;
+
+			@Before
+			public void setUp()
+			{
+				map = new HashMap<>();
+				map.put(0, 0);
+				map.put(1, 1);
+				map.put(2, 2);
+				values = map.keySet();
+				it = values.iterator();
 			}
 
-			Iterator<Integer> it = values.iterator();
-			while (it.hasNext()) {
-				int n = it.next();
-				assertTrue(set.contains(n));
+			@Test
+			public void hasNext() throws Exception
+			{
+				int counter = 0;
+				while (it.hasNext() == true) {
+					Integer actual = it.next();
+					assertEquals(counter, (long) actual);
+					counter++;
+				}
+
+				assertEquals(3, counter);
 			}
 
-			assertFalse(it.hasNext());
+			@Test
+			public void next() throws Exception
+			{
+				int counter = 0;
+				while (it.hasNext() == true) {
+					Integer actual = it.next();
+					assertEquals(counter, (long) actual);
+					counter++;
+				}
+
+				assertEquals(3, counter);
+			}
+
+			@Test(expected = NoSuchElementException.class)
+			public void nextThrowsNoSuchElementException() throws Exception
+			{
+				it.next();
+				it.next();
+				it.next();
+				it.next();
+			}
+
+			@Test
+			public void remove() throws Exception
+			{
+				int counter = 0;
+				while (it.hasNext() == true) {
+					it.next();
+					it.remove();
+					counter++;
+				}
+
+				assertEquals(3, counter);
+				assertTrue(values.isEmpty());
+			}
+
+			@Test(expected = IllegalStateException.class)
+			public void removeThrowsIllegalStateException() throws Exception
+			{
+				it.remove();
+			}
 		}
 
 		@Test
@@ -471,7 +526,7 @@ public class HashMapTest
 		assertSame(map.entrySet(), map.entrySet());
 	}
 
-	public static class NodeSetTest
+	public static class HashMapEntrySetTest
 	{
 
 		private HashMap<Integer, Integer>        map;
@@ -530,29 +585,78 @@ public class HashMapTest
 			assertTrue(set.contains(pair(1, 1)));
 		}
 
-		@Test
-		public void iterator()
+		public static class HashMapEntryIteratorTest
 		{
-			map.put(0, 0);
-			map.put(1, 1);
-			map.put(2, 2);
 
-			Iterator<Entry<Integer, Integer>> it = set.iterator();
+			private HashMap<Integer, Integer>         map;
+			private Set<Entry<Integer, Integer>>      set;
+			private Iterator<Entry<Integer, Integer>> it;
 
-			int counter = 0;
-			while (it.hasNext() == true) {
-				counter++;
+			@Before
+			public void setUp()
+			{
+				map = new HashMap<>();
+				map.put(0, 0);
+				map.put(1, 1);
+				map.put(2, 2);
+				set = map.entrySet();
+				it = set.iterator();
+			}
+
+			@Test
+			public void hasNext() throws Exception
+			{
+				int counter = 0;
+				while (it.hasNext() == true) {
+					Integer actual = it.next().getKey();
+					assertEquals(counter, (long) actual);
+					counter++;
+				}
+
+				assertEquals(3, counter);
+			}
+
+			@Test
+			public void next() throws Exception
+			{
+				int counter = 0;
+				while (it.hasNext() == true) {
+					Integer actual = it.next().getKey();
+					assertEquals(counter, (long) actual);
+					counter++;
+				}
+
+				assertEquals(3, counter);
+			}
+
+			@Test(expected = NoSuchElementException.class)
+			public void nextThrowsNoSuchElementException() throws Exception
+			{
+				it.next();
+				it.next();
+				it.next();
 				it.next();
 			}
-			assertEquals(3, counter);
-		}
 
-		@Test(expected = NoSuchElementException.class)
-		public void iteratorThrowsNoSuchElementExceptions()
-		{
-			Iterator<Entry<Integer, Integer>> it = set.iterator();
+			@Test
+			public void remove() throws Exception
+			{
+				int counter = 0;
+				while (it.hasNext() == true) {
+					it.next();
+					it.remove();
+					counter++;
+				}
 
-			it.next();
+				assertEquals(3, counter);
+				assertTrue(set.isEmpty());
+			}
+
+			@Test(expected = IllegalStateException.class)
+			public void removeThrowsIllegalStateException() throws Exception
+			{
+				it.remove();
+			}
 		}
 
 		@Test
@@ -723,7 +827,7 @@ public class HashMapTest
 		assertSame(map.keySet(), map.keySet());
 	}
 
-	public static class KeySetTest
+	public static class HashMapKeySetTest
 	{
 
 		private HashMap<Integer, Integer> map;
@@ -766,29 +870,78 @@ public class HashMapTest
 			assertFalse(set.contains(1));
 		}
 
-		@Test
-		public void iterator() throws Exception
+		public static class HashMapKeyIteratorTest
 		{
-			map.put(0, 0);
-			map.put(1, 1);
-			map.put(2, 2);
 
-			Iterator<Integer> it = set.iterator();
+			private HashMap<Integer, Integer> map;
+			private Set<Integer>              set;
+			private Iterator<Integer>         it;
 
-			int counter = 0;
-			while (it.hasNext()) {
-				it.next();
-				counter++;
+			@Before
+			public void setUp()
+			{
+				map = new HashMap<>();
+				map.put(0, 0);
+				map.put(1, 1);
+				map.put(2, 2);
+				set = map.keySet();
+				it = set.iterator();
 			}
 
-			assertFalse(it.hasNext());
-			assertEquals(3, counter);
-		}
+			@Test
+			public void hasNext() throws Exception
+			{
+				int counter = 0;
+				while (it.hasNext() == true) {
+					Integer actual = it.next();
+					assertEquals(counter, (long) actual);
+					counter++;
+				}
 
-		@Test(expected = NoSuchElementException.class)
-		public void iteratorThrowsNoSuchElementException() throws Exception
-		{
-			set.iterator().next();
+				assertEquals(3, counter);
+			}
+
+			@Test
+			public void next() throws Exception
+			{
+				int counter = 0;
+				while (it.hasNext() == true) {
+					Integer actual = it.next();
+					assertEquals(counter, (long) actual);
+					counter++;
+				}
+
+				assertEquals(3, counter);
+			}
+
+			@Test(expected = NoSuchElementException.class)
+			public void nextThrowsNoSuchElementException() throws Exception
+			{
+				it.next();
+				it.next();
+				it.next();
+				it.next();
+			}
+
+			@Test
+			public void remove() throws Exception
+			{
+				int counter = 0;
+				while (it.hasNext() == true) {
+					it.next();
+					it.remove();
+					counter++;
+				}
+
+				assertEquals(3, counter);
+				assertTrue(set.isEmpty());
+			}
+
+			@Test(expected = IllegalStateException.class)
+			public void removeThrowsIllegalStateException() throws Exception
+			{
+				it.remove();
+			}
 		}
 
 		@Test

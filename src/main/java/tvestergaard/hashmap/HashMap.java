@@ -35,12 +35,12 @@ public class HashMap<K, V> implements Map<K, V>
 	/**
 	 * Cached collection of values <code>V</code> that can be returned by the {@link HashMap#values()} method.
 	 */
-	private Collection<V> cachedValuesCollection;
+	private Collection<V> cachedValueCollection;
 
 	/**
 	 * Cached set of entries that can be returned by the {@link HashMap#entrySet()} method.
 	 */
-	private Set<Entry<K, V>> cachedNodeSet = null;
+	private Set<Entry<K, V>> cachedEntrySet = null;
 
 	/**
 	 * Cached set of keys <code>K</code> that can be returned by the {@link HashMap#keySet()} method.
@@ -381,16 +381,16 @@ public class HashMap<K, V> implements Map<K, V>
 	@Override
 	public Collection<V> values()
 	{
-		if (cachedValuesCollection == null)
-			cachedValuesCollection = new HashMapValues();
+		if (cachedValueCollection == null)
+			cachedValueCollection = new HashMapValueCollection();
 
-		return cachedValuesCollection;
+		return cachedValueCollection;
 	}
 
 	/**
 	 * Collection implementation allowing for collection methods on the values in the {@link HashMap}.
 	 */
-	private class HashMapValues implements Collection<V>
+	private class HashMapValueCollection implements Collection<V>
 	{
 
 		/**
@@ -433,13 +433,13 @@ public class HashMap<K, V> implements Map<K, V>
 		 */
 		@Override public Iterator<V> iterator()
 		{
-			return new HashMapValuesIterator();
+			return new HashMapValueIterator();
 		}
 
 		/**
 		 * Iterator implementation for iterating through the values in the {@link HashMap}.
 		 */
-		private class HashMapValuesIterator extends HashMapIterator<V>
+		private class HashMapValueIterator extends HashMapIterator<V>
 		{
 
 			/**
@@ -450,7 +450,7 @@ public class HashMap<K, V> implements Map<K, V>
 			 */
 			@Override public boolean hasNext()
 			{
-				return super.hasNextNode();
+				return super.hasNext();
 			}
 
 			/**
@@ -711,6 +711,11 @@ public class HashMap<K, V> implements Map<K, V>
 		private int currentBucket;
 
 		/**
+		 * The {@link Node} last returned by the {@link HashMapIterator#nextNode()} method.
+		 */
+		private Node<K, V> previous;
+
+		/**
 		 * The previously returned entry.
 		 */
 		private Node<K, V> nextEntry;
@@ -730,9 +735,28 @@ public class HashMap<K, V> implements Map<K, V>
 		 *
 		 * @return {@code true} if the iteration has more elements
 		 */
-		public boolean hasNextNode()
+		@Override public boolean hasNext()
 		{
 			return nextEntry != null;
+		}
+
+		/**
+		 * Removes from the underlying collection the last element returned by this iterator (optional operation). This
+		 * method can be called only once per call to {@link #next}.  The behavior of an iterator is unspecified if the
+		 * underlying collection is modified while the iteration is in progress in any way other than by calling this
+		 * method.
+		 *
+		 * @throws IllegalStateException if the {@code next} method has not yet been called, or the {@code remove}
+		 *                               method has already been called after the last call to the {@code next} method
+		 */
+		@Override public void remove()
+		{
+			if (previous == null)
+				throw new IllegalStateException("Nothing to remove.");
+
+			removeNode(previous.hash, previous.key);
+
+			previous = null;
 		}
 
 		/**
@@ -746,9 +770,9 @@ public class HashMap<K, V> implements Map<K, V>
 			if (nextEntry == null)
 				throw new NoSuchElementException();
 
-			Node<K, V> result = nextEntry;
-			nextEntry = getNextNode(result);
-			return result;
+			previous = nextEntry;
+			nextEntry = getNextNode(previous);
+			return previous;
 		}
 
 		/**
@@ -1020,16 +1044,16 @@ public class HashMap<K, V> implements Map<K, V>
 	 */
 	@Override public Set<Entry<K, V>> entrySet()
 	{
-		if (cachedNodeSet == null)
-			cachedNodeSet = new NodeSet();
+		if (cachedEntrySet == null)
+			cachedEntrySet = new HashMapEntrySet();
 
-		return cachedNodeSet;
+		return cachedEntrySet;
 	}
 
 	/**
 	 * {@link HashMap} backed {@link Set} allowing for {@link Set} operations on the {@link HashMap}.
 	 */
-	private class NodeSet implements Set<Entry<K, V>>
+	private class HashMapEntrySet implements Set<Entry<K, V>>
 	{
 
 		/**
@@ -1078,11 +1102,6 @@ public class HashMap<K, V> implements Map<K, V>
 
 		private class HashMapEntryIterator extends HashMapIterator<Entry<K, V>>
 		{
-			@Override public boolean hasNext()
-			{
-				return super.hasNextNode();
-			}
-
 			@Override public Entry<K, V> next()
 			{
 				return nextNode();
@@ -1159,7 +1178,7 @@ public class HashMap<K, V> implements Map<K, V>
 		}
 
 		/**
-		 * Adds the provided entry to the {@link NodeSet} when it does not already exist in the set. The entry is only
+		 * Adds the provided entry to the {@link HashMapEntrySet} when it does not already exist in the set. The entry is only
 		 * added when a {@link Node} with the an equal key and value doesn't exist in the set. Null values cannot be
 		 * allowed.
 		 *
@@ -1179,9 +1198,9 @@ public class HashMap<K, V> implements Map<K, V>
 
 		/**
 		 * Removes the specified element from this set if it is present. More formally, removes an element <tt>e</tt>
-		 * such that <tt>(o==null ? e==null : o.equals(e))</tt>, if this set contains such an
-		 * element.  Returns <tt>true</tt> if this set contained the element (or equivalently, if this set changed as a
-		 * result of the call).
+		 * such that <tt>(o==null ? e==null : o.equals(e))</tt>, if this set contains such an element.  Returns
+		 * <tt>true</tt> if this set contained the element (or equivalently, if this set changed as a result of the
+		 * call).
 		 *
 		 * @param o object to be removed from this set, if present
 		 *
@@ -1359,7 +1378,7 @@ public class HashMap<K, V> implements Map<K, V>
 	@Override public Set<K> keySet()
 	{
 		if (cachedKeySet == null)
-			cachedKeySet = new KeySet();
+			cachedKeySet = new HashMapKeySet();
 
 		return cachedKeySet;
 	}
@@ -1367,7 +1386,7 @@ public class HashMap<K, V> implements Map<K, V>
 	/**
 	 * {@link HashMap} backed {@link Set} allowing for {@link Set} operations on the keys in the {@link HashMap}.
 	 */
-	private class KeySet implements Set<K>
+	private class HashMapKeySet implements Set<K>
 	{
 		/**
 		 * Returns the number of elements in this set.
@@ -1417,12 +1436,6 @@ public class HashMap<K, V> implements Map<K, V>
 		 */
 		private final class HashMapKeyIterator extends HashMapIterator<K>
 		{
-
-			@Override public boolean hasNext()
-			{
-				return hasNextNode();
-			}
-
 			@Override public K next()
 			{
 				return nextNode().key;
@@ -1483,9 +1496,9 @@ public class HashMap<K, V> implements Map<K, V>
 
 		/**
 		 * Removes the specified element from this set if it is present More formally, removes an element <tt>e</tt>
-		 * such that <tt>(o==null ? e==null : o.equals(e))</tt>, if this set contains such an
-		 * element.  Returns <tt>true</tt> if this set contained the element (or equivalently, if this set changed as a
-		 * result of the call).  (This set will not contain the element once the call returns.)
+		 * such that <tt>(o==null ? e==null : o.equals(e))</tt>, if this set contains such an element.  Returns
+		 * <tt>true</tt> if this set contained the element (or equivalently, if this set changed as a result of the
+		 * call).  (This set will not contain the element once the call returns.)
 		 *
 		 * @param o object to be removed from this set, if present
 		 *
