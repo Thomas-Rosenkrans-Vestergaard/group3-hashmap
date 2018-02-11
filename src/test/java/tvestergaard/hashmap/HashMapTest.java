@@ -243,7 +243,7 @@ public class HashMapTest
 			assertFalse(values.contains(5));
 		}
 
-		public static class HashMapValueCollectionTestTest
+		public static class HashMapValueIteratorTest
 		{
 
 			private HashMap<Integer, Integer> map;
