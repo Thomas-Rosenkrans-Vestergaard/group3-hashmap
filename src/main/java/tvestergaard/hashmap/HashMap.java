@@ -213,8 +213,7 @@ public class HashMap<K, V> implements Map<K, V> {
             this.next = next;
         }
 
-        @Override
-        public boolean equals(Object o)
+        @Override public boolean equals(Object o)
         {
             if (this == o) return true;
             if (!(o instanceof Entry)) return false;
@@ -223,502 +222,17 @@ public class HashMap<K, V> implements Map<K, V> {
                     Objects.equals(value, entry.getValue());
         }
 
-        @Override
-        public int hashCode()
+        @Override public int hashCode()
         {
             return Objects.hash(hash, key, value);
         }
     }
 
-    @Override
-    public int size()
-    {
-        return size;
-    }
-
-    @Override
-    public boolean isEmpty()
-    {
-        return size == 0;
-    }
-
     /**
-     * Returns <tt>true</tt> if this map contains a mapping for the specified key.
+     * Abstract iterator, allows for iteration through the nodes in the {@link TreeMap} using the
+     * {@link HashMapIterator#nextNode()} method.
      *
-     * @param key The key whose presence in this map is to be tested.
-     *
-     * @return <tt>true</tt> if this map contains a mapping for the specified key.
-     */
-    @Override
-    public boolean containsKey(Object key)
-    {
-        Node<K, V> node = getNode(hash(key), key);
-
-        return node != null;
-    }
-
-    /**
-     * Returns <tt>true</tt> if this map maps one or more keys to the specified value.
-     *
-     * @param value The value whose presence in this map is to be tested.
-     *
-     * @return <tt>true</tt> if this map maps one or more keys to the specified value.
-     */
-    @Override
-    public boolean containsValue(Object value)
-    {
-        for (Node<K, V> head : buckets) {
-            Node<K, V> current = head;
-            while (current != null) {
-                if (current.value == null ? value == null : current.value.equals(value))
-                    return true;
-
-                current = current.next;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Returns the value to which the specified key is mapped, or {@code null} if this map contains no mapping for the
-     * key.
-     * <p>
-     * <p>More formally, if this map contains a mapping from a key {@code k} to a value {@code v} such that {@code
-     * (key==null ? k==null : key.equals(k))}, then this method returns {@code v}; otherwise it returns {@code null}.
-     * (There can be at most one such mapping.)
-     * <p>
-     * <p>A return value of {@code null} does not <i>necessarily</i> indicate that the map contains no mapping for the
-     * key; it's also possible that the map explicitly maps the key to {@code null}. The {@link #containsKey
-     * containsKey} operation may be used to distinguish these two cases.
-     *
-     * @see #put(Object, Object)
-     */
-    @Override
-    public V get(Object key)
-    {
-        Node<K, V> node = getNode(hash(key), key);
-
-        return node == null ? null : node.value;
-    }
-
-    /**
-     * Associates the specified value with the specified key in this map. If the map previously contained a mapping for
-     * the key, the old value is replaced.
-     *
-     * @param key   key with which the specified value is to be associated
-     * @param value value to be associated with the specified key
-     *
-     * @return the previous value associated with <tt>key</tt>, or <tt>null</tt> if there was no mapping for
-     * <tt>key</tt>. (A <tt>null</tt> return can also indicate that the map previously associated <tt>null</tt> with
-     * <tt>key</tt>.)
-     */
-    @Override
-    public V put(K key, V value)
-    {
-        return putNode(hash(key), key, value, null);
-    }
-
-    /**
-     * Removes the mapping for the specified key from this map if present.
-     *
-     * @param key key whose mapping is to be removed from the map
-     *
-     * @return the previous value associated with <tt>key</tt>, or <tt>null</tt> if there was no mapping for
-     * <tt>key</tt>. (A <tt>null</tt> return can also indicate that the map previously associated <tt>null</tt> with
-     * <tt>key</tt>.)
-     */
-    @Override
-    public V remove(Object key)
-    {
-        Node<K, V> removed = removeNode(hash(key), key);
-
-        return removed == null ? null : removed.value;
-    }
-
-    /**
-     * Copies all of the mappings from the specified map to this map. These mappings will replace any mappings
-     * that this map had for any of the keys currently in the specified map.
-     *
-     * @param m mappings to be stored in this map. No entries are added if the provided map is <code>null</code>.
-     */
-    @Override
-    public void putAll(Map<? extends K, ? extends V> m)
-    {
-        if (m != null) {
-            for (Entry<? extends K, ? extends V> entry : m.entrySet()) {
-                K key = entry.getKey();
-                V value = entry.getValue();
-                putNode(hash(key), key, value, null);
-            }
-        }
-    }
-
-    /**
-     * Removes all of the mappings from this map.
-     * <p>
-     * The map will be empty after this call returns.
-     */
-    @Override
-    public void clear()
-    {
-        if (size > 0) {
-            for (int x = 0; size > 0 && x < buckets.length; x++) {
-                if (buckets[x] != null) {
-                    buckets[x] = null;
-                    size--;
-                }
-            }
-        }
-    }
-
-    /**
-     * Returns a {@link Collection} view of the values contained in this map. The collection is backed by the map, so
-     * changes to the map are reflected in the collection, and vice-versa.  If the map is modified while an iteration
-     * over the collection is in progress (except through the iterator's own <tt>remove</tt> operation), the results of
-     * the iteration are undefined.  The collection supports element removal, which removes the corresponding mapping
-     * from the map, via the <tt>Iterator.remove</tt>, <tt>Collection.remove</tt>, <tt>removeAll</tt>,
-     * <tt>retainAll</tt> and <tt>clear</tt> operations.  It does not support the <tt>add</tt> or <tt>addAll</tt>
-     * operations.
-     *
-     * @return a view of the values contained in this map
-     */
-    @Override
-    public Collection<V> values()
-    {
-        if (cachedValueCollection == null)
-            cachedValueCollection = new HashMapValueCollection();
-
-        return cachedValueCollection;
-    }
-
-    /**
-     * Collection implementation allowing for collection methods on the values in the {@link HashMap}.
-     */
-    private class HashMapValueCollection implements Collection<V> {
-
-        /**
-         * Returns the number of elements in this collection.
-         *
-         * @return The number of elements in this collection.
-         */
-        @Override
-        public int size()
-        {
-            return size;
-        }
-
-        /**
-         * Returns <code>true</code> if this collection contains no elements.
-         *
-         * @return <code>true</code> if this collection contains no elements
-         */
-        @Override
-        public boolean isEmpty()
-        {
-            return size == 0;
-        }
-
-        /**
-         * Returns <code>true</code> if this collection contains the specified element.
-         *
-         * @param o element whose presence in this collection is to be tested.
-         *
-         * @return <code>true</code> if this collection contains the specified element.
-         */
-        @Override
-        public boolean contains(Object o)
-        {
-            return containsValue(o);
-        }
-
-        /**
-         * Returns an iterator over the elements in this collection.  There are no guarantees concerning the order in
-         * which the elements are returned.
-         *
-         * @return an <tt>Iterator</tt> over the elements in this collection.
-         */
-        @Override
-        public Iterator<V> iterator()
-        {
-            return new HashMapValueIterator();
-        }
-
-        /**
-         * Iterator implementation for iterating through the values in the {@link HashMap}.
-         */
-        private class HashMapValueIterator extends HashMapIterator<V> {
-
-            /**
-             * Returns {@code true} if the iteration has more elements. (In other words, returns {@code true} if {@link
-             * #next} would return an element rather than throwing an exception.)
-             *
-             * @return {@code true} if the iteration has more elements.
-             */
-            @Override
-            public boolean hasNext()
-            {
-                return super.hasNext();
-            }
-
-            /**
-             * Returns the next element in the iteration.
-             *
-             * @return the next element in the iteration
-             * @throws NoSuchElementException if the iteration has no more elements
-             */
-            @Override
-            public V next()
-            {
-                return super.nextNode().value;
-            }
-        }
-
-        /**
-         * Returns an array containing all of the elements in this collection.
-         *
-         * @return an array containing all of the elements in this collection
-         */
-        @Override
-        public Object[] toArray()
-        {
-            int index = 0;
-            Object[] result = new Object[size];
-            for (Node<K, V> current : buckets) {
-                while (current != null) {
-                    result[index++] = current.value;
-                    current = current.next;
-                }
-            }
-
-            return result;
-        }
-
-        /**
-         * Returns an array containing all of the elements in this collection; the runtime type of the returned
-         * array is
-         * that of the specified array. If the collection fits in the specified array, it is returned therein.
-         * Otherwise, a new array is allocated with the runtime type of the specified array and the size of this
-         * collection.
-         * <p>
-         *
-         * @param a the array into which the elements of this collection are to be stored, if it is big enough;
-         *          otherwise, a new array of the same runtime type is allocated for this purpose.
-         *
-         * @return an array containing all of the elements in this collection
-         * @throws ArrayStoreException if the runtime type of the specified array is not a supertype of the runtime
-         *                             type
-         *                             of every element in this collection
-         */
-        @Override
-        public <T> T[] toArray(T[] a)
-        {
-            int size = size();
-            T[] r = a.length >= size && a != null ? a : (T[]) java.lang.reflect.Array.newInstance(
-                    a.getClass().getComponentType(),
-                    size
-            );
-
-            int nextIndex = 0;
-            for (Node<K, V> current : buckets) {
-                while (current != null) {
-                    r[nextIndex++] = (T) current.value;
-                    current = current.next;
-                }
-            }
-
-            return r;
-        }
-
-        /**
-         * Unsupported operation.
-         *
-         * @throws UnsupportedOperationException
-         */
-        @Override
-        public boolean add(V v)
-        {
-            throw new UnsupportedOperationException();
-        }
-
-        /**
-         * Removes a single instance of the specified element from this collection, if it is present.
-         *
-         * @param o element to be removed from this collection, if present
-         *
-         * @return <tt>true</tt> if an element was removed as a result of this call
-         */
-        @Override
-        public boolean remove(Object o)
-        {
-            for (int x = 0; x < buckets.length; x++) {
-                Node<K, V> current = buckets[x];
-                Node<K, V> previous = null;
-                while (current != null) {
-                    if (current.value == null ? o == null : current.value.equals(o)) {
-                        if (previous != null)
-                            previous.setNext(current.next);
-                        else
-                            buckets[x] = current.next;
-                        size--;
-                        return true;
-                    }
-
-                    previous = current;
-                    current = current.next;
-                }
-            }
-
-            return false;
-        }
-
-        /**
-         * Returns <tt>true</tt> if this collection contains all of the elements in the specified collection.
-         *
-         * @param c collection to be checked for containment in this collection
-         *
-         * @return <tt>true</tt> if this collection contains all of the elements in the specified collection.
-         * @see #contains(Object)
-         */
-        @Override
-        public boolean containsAll(Collection<?> c)
-        {
-            if (c == null || c.isEmpty())
-                return false;
-
-            for (Object o : c)
-                if (!HashMap.this.containsValue(o))
-                    return false;
-
-            return true;
-        }
-
-        /**
-         * Unsupported operation.
-         *
-         * @throws UnsupportedOperationException
-         */
-        @Override
-        public boolean addAll(Collection<? extends V> c)
-        {
-            throw new UnsupportedOperationException();
-        }
-
-        /**
-         * Removes all of this collection's elements that are also contained in the specified collection. After this
-         * call returns, this collection will contain no elements in common with the specified collection.
-         *
-         * @param c collection containing elements to be removed from this collection.
-         *
-         * @return <tt>true</tt> if this collection changed as a result of the call.
-         * @see #remove(Object)
-         * @see #contains(Object)
-         */
-        @Override
-        public boolean removeAll(Collection<?> c)
-        {
-            if (c == null || c.isEmpty())
-                return false;
-
-            boolean changed = false;
-            for (int x = 0; x < buckets.length; x++) {
-                Node<K, V> current = buckets[x];
-                Node<K, V> previous = null;
-                while (current != null) {
-                    if (c.contains(current.value)) {
-                        if (previous != null)
-                            previous.setNext(current.next);
-                        else
-                            buckets[x] = current.next;
-                        size--;
-                        changed = true;
-                    }
-
-                    previous = current;
-                    current = current.next;
-                }
-            }
-
-            return changed;
-        }
-
-        /**
-         * Retains only the elements in this collection that are contained in the specified collection.  In other
-         * words,
-         * removes from this collection all of its elements that are not contained in the specified collection.
-         *
-         * @param c collection containing elements to be retained in this collection
-         *
-         * @return <tt>true</tt> if this collection changed as a result of the call
-         * @see #remove(Object)
-         * @see #contains(Object)
-         */
-        @Override
-        public boolean retainAll(Collection<?> c)
-        {
-            if (c == null || c.isEmpty())
-                return false;
-
-            boolean changed = false;
-            for (int x = 0; x < buckets.length; x++) {
-                Node<K, V> current = buckets[x];
-                Node<K, V> previous = null;
-                while (current != null) {
-                    if (!c.contains(current.value)) {
-                        if (previous != null)
-                            previous.setNext(current.next);
-                        else
-                            buckets[x] = current.next;
-                        size--;
-                        changed = true;
-                    }
-
-                    previous = current;
-                    current = current.next;
-                }
-            }
-
-            return changed;
-        }
-
-        /**
-         * Removes all of the elements from this collection.
-         */
-        @Override
-        public void clear()
-        {
-            HashMap.this.clear();
-        }
-    }
-
-    /**
-     * Returns the current capacity of the {@link HashMap}. The capacity is the number of buckets in the {@link
-     * HashMap}. The capacity will automatically increase depending on the <code>loadFactor</code> of the {@link
-     * HashMap}.
-     *
-     * @return The current capacity.
-     */
-    public int capacity()
-    {
-        return this.buckets.length;
-    }
-
-    /**
-     * Returns the <code>loadFactor</code> used in the {@link HashMap}.  The <code>loadFactor</code> influences how
-     * often the {@link HashMap} is expanded. The {@link HashMap} is expanded when the number of entries equals or
-     * exceeds the <code>capacity * loadFactor</code>.
-     *
-     * @return The <code>loadFactor</code>.
-     */
-    public double getLoadFactor()
-    {
-        return this.loadFactor;
-    }
-
-    /**
-     * Iterator helper class for iterating through the nodes in the {@link HashMap}.
-     *
-     * @param <T>
+     * @param <T> The type argument for the iterator to create.
      */
     abstract private class HashMapIterator<T> implements Iterator<T> {
 
@@ -733,9 +247,9 @@ public class HashMap<K, V> implements Map<K, V> {
         private Node<K, V> previous;
 
         /**
-         * The previously returned entry.
+         * The node to be returned next from the {@link HashMapIterator#nextNode} method.
          */
-        private Node<K, V> nextEntry;
+        private Node<K, V> nextNode;
 
         /**
          * Creates a new {@link HashMapIterator}.
@@ -743,19 +257,17 @@ public class HashMap<K, V> implements Map<K, V> {
         HashMapIterator()
         {
             currentBucket = -1;
-            nextEntry = getNextHead();
+            nextNode = getNextHead();
         }
 
         /**
-         * Returns {@code true} if the iteration has more elements. (In other words, returns {@code true} if  would
-         * return an element rather than throwing an exception.)
+         * Returns {@code true} if the iteration has more elements.
          *
          * @return {@code true} if the iteration has more elements
          */
-        @Override
-        public boolean hasNext()
+        @Override public boolean hasNext()
         {
-            return nextEntry != null;
+            return nextNode != null;
         }
 
         /**
@@ -767,8 +279,7 @@ public class HashMap<K, V> implements Map<K, V> {
          * @throws IllegalStateException if the {@code next} method has not yet been called, or the {@code remove}
          *                               method has already been called after the last call to the {@code next} method
          */
-        @Override
-        public void remove()
+        @Override public void remove()
         {
             if (previous == null)
                 throw new IllegalStateException("Nothing to remove.");
@@ -786,11 +297,11 @@ public class HashMap<K, V> implements Map<K, V> {
          */
         public Node<K, V> nextNode()
         {
-            if (nextEntry == null)
+            if (nextNode == null)
                 throw new NoSuchElementException();
 
-            previous = nextEntry;
-            nextEntry = getNextNode(previous);
+            previous = nextNode;
+            nextNode = getNextNode(previous);
             return previous;
         }
 
@@ -826,6 +337,1055 @@ public class HashMap<K, V> implements Map<K, V> {
 
             return null;
         }
+    }
+
+    /**
+     * Returns the number of key-value mappings in this map.
+     *
+     * @return the number of key-value mappings in this map
+     */
+    @Override public int size()
+    {
+        return size;
+    }
+
+    /**
+     * Returns <tt>true</tt> if this map contains no key-value mappings.
+     *
+     * @return <tt>true</tt> if this map contains no key-value mappings
+     */
+    @Override public boolean isEmpty()
+    {
+        return size == 0;
+    }
+
+    /**
+     * Returns <tt>true</tt> if this map contains a mapping for the specified key.
+     *
+     * @param key The key whose presence in this map is to be tested.
+     *
+     * @return <tt>true</tt> if this map contains a mapping for the specified key.
+     */
+    @Override public boolean containsKey(Object key)
+    {
+        Node<K, V> node = getNode(hash(key), key);
+
+        return node != null;
+    }
+
+    /**
+     * Returns <tt>true</tt> if this map maps one or more keys to the specified value.
+     *
+     * @param value The value whose presence in this map is to be tested.
+     *
+     * @return <tt>true</tt> if this map maps one or more keys to the specified value.
+     */
+    @Override public boolean containsValue(Object value)
+    {
+        for (Node<K, V> head : buckets) {
+            Node<K, V> current = head;
+            while (current != null) {
+                if (current.value == null ? value == null : current.value.equals(value))
+                    return true;
+
+                current = current.next;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns the value to which the specified key is mapped, or {@code null} if this map contains no mapping for the
+     * key.
+     * <p>
+     * <p>More formally, if this map contains a mapping from a key {@code k} to a value {@code v} such that {@code
+     * (key==null ? k==null : key.equals(k))}, then this method returns {@code v}; otherwise it returns {@code null}.
+     * (There can be at most one such mapping.)
+     * <p>
+     * <p>A return value of {@code null} does not <i>necessarily</i> indicate that the map contains no mapping for the
+     * key; it's also possible that the map explicitly maps the key to {@code null}. The {@link #containsKey
+     * containsKey} operation may be used to distinguish these two cases.
+     *
+     * @param key the key whose associated value is to be returned
+     *
+     * @see #put(Object, Object)
+     */
+    @Override public V get(Object key)
+    {
+        Node<K, V> node = getNode(hash(key), key);
+
+        return node == null ? null : node.value;
+    }
+
+    /**
+     * Associates the specified value with the specified key in this map. If the map previously contained a mapping for
+     * the key, the old value is replaced.
+     *
+     * @param key   key with which the specified value is to be associated
+     * @param value value to be associated with the specified key
+     *
+     * @return the previous value associated with <tt>key</tt>, or <tt>null</tt> if there was no mapping for
+     * <tt>key</tt>. (A <tt>null</tt> return can also indicate that the map previously associated <tt>null</tt> with
+     * <tt>key</tt>.)
+     */
+    @Override public V put(K key, V value)
+    {
+        return putNode(hash(key), key, value, null);
+    }
+
+    /**
+     * Removes the mapping for the specified key from this map if present.
+     *
+     * @param key key whose mapping is to be removed from the map
+     *
+     * @return the previous value associated with <tt>key</tt>, or <tt>null</tt> if there was no mapping for
+     * <tt>key</tt>. (A <tt>null</tt> return can also indicate that the map previously associated <tt>null</tt> with
+     * <tt>key</tt>.)
+     */
+    @Override public V remove(Object key)
+    {
+        Node<K, V> removed = removeNode(hash(key), key);
+
+        return removed == null ? null : removed.value;
+    }
+
+    /**
+     * Copies all of the mappings from the specified map to this map.  The effect of this call is
+     * equivalent to that of calling {@link #put(Object, Object) put(k, v)} on this map once for each mapping from key
+     * <tt>k</tt> to value <tt>v</tt> in the specified map.  The behavior of this operation is undefined if the
+     * specified map is modified while the operation is in progress.
+     *
+     * @param m mappings to be stored in this map.
+     */
+    @Override public void putAll(Map<? extends K, ? extends V> m)
+    {
+        if (m != null) {
+            for (Entry<? extends K, ? extends V> entry : m.entrySet()) {
+                K key = entry.getKey();
+                V value = entry.getValue();
+                putNode(hash(key), key, value, null);
+            }
+        }
+    }
+
+    /**
+     * Removes all of the mappings from this map.
+     */
+    @Override public void clear()
+    {
+        if (size > 0) {
+            for (int x = 0; size > 0 && x < buckets.length; x++) {
+                if (buckets[x] != null) {
+                    buckets[x] = null;
+                    size--;
+                }
+            }
+        }
+    }
+
+    /**
+     * Returns a {@link Collection} view of the values contained in this map. The collection is backed by the map, so
+     * changes to the map are reflected in the collection, and vice-versa.  If the map is modified while an iteration
+     * over the collection is in progress (except through the iterator's own <tt>remove</tt> operation), the results of
+     * the iteration are undefined.  The collection supports element removal, which removes the corresponding mapping
+     * from the map, via the <tt>Iterator.remove</tt>, <tt>Collection.remove</tt>, <tt>removeAll</tt>,
+     * <tt>retainAll</tt> and <tt>clear</tt> operations.  It does not support the <tt>add</tt> or <tt>addAll</tt>
+     * operations.
+     *
+     * @return a view of the values contained in this map
+     */
+    @Override public Collection<V> values()
+    {
+        if (cachedValueCollection == null)
+            cachedValueCollection = new HashMapValueCollection();
+
+        return cachedValueCollection;
+    }
+
+    /**
+     * Collection backed by the {@link HashMap}. Changed made to the {@link TreeMap} are reflected in the
+     * {@link HashMapValueCollection} and vice versa. The same instance of {@link HashMapValueCollection} should be
+     * returned on multiple calls to the {@link TreeMap#values()} method.
+     */
+    private class HashMapValueCollection implements Collection<V> {
+
+        /**
+         * Returns the number of values in the {@link HashMap}.
+         *
+         * @return The number of values in the {@link HashMap}.
+         */
+        @Override public int size()
+        {
+            return size;
+        }
+
+        /**
+         * Returns <code>true</code> if the {@link HashMap} contains no values.
+         *
+         * @return <code>true</code> if the {@link HashMap} contains no values
+         */
+        @Override public boolean isEmpty()
+        {
+            return size == 0;
+        }
+
+        /**
+         * Returns <code>true</code> if the {@link HashMap} contains the specified value.
+         *
+         * @param o value whose presence in the {@link HashMap} is to be tested.
+         *
+         * @return <code>true</code> if the {@link HashMap} contains the specified value.
+         */
+        @Override public boolean contains(Object o)
+        {
+            return containsValue(o);
+        }
+
+        /**
+         * Returns an iterator over the values in the {@link HashMap}.  There are no guarantees concerning the order in
+         * which the values are returned.
+         *
+         * @return an <tt>Iterator</tt> over the values in the {@link HashMap}.
+         */
+        @Override public Iterator<V> iterator()
+        {
+            return new HashMapValueIterator();
+        }
+
+        /**
+         * Iterator implementation extending from {@link HashMapIterator} allowing for easy iteration of the values
+         * in the {@link HashMap}.
+         */
+        private class HashMapValueIterator extends HashMapIterator<V> {
+
+            /**
+             * Returns the next value in the iteration.
+             *
+             * @return the next value in the iteration
+             * @throws NoSuchElementException if the iteration has no more values
+             */
+            @Override public V next()
+            {
+                return super.nextNode().value;
+            }
+        }
+
+        /**
+         * Returns an array containing all of the values in the {@link HashMap}.
+         *
+         * @return an array containing all of the values in the {@link HashMap}
+         */
+        @Override public Object[] toArray()
+        {
+            int index = 0;
+            Object[] result = new Object[size];
+            for (Node<K, V> current : buckets) {
+                while (current != null) {
+                    result[index++] = current.value;
+                    current = current.next;
+                }
+            }
+
+            return result;
+        }
+
+        /**
+         * Returns an array containing all of the values in the {@link HashMap}; the runtime type of the returned
+         * array is
+         * that of the specified array. If the collection fits in the specified array, it is returned therein.
+         * Otherwise, a new array is allocated with the runtime type of the specified array and the size of this
+         * collection.
+         * <p>
+         *
+         * @param a the array into which the values of the {@link HashMap} are to be stored, if it is big enough;
+         *          otherwise, a new array of the same runtime type is allocated for this purpose.
+         *
+         * @return an array containing all of the values in the {@link HashMap}
+         * @throws ArrayStoreException if the runtime type of the specified array is not a supertype of the runtime
+         *                             type of every value in the {@link HashMap}
+         */
+        @Override public <T> T[] toArray(T[] a)
+        {
+            int size = size();
+            T[] r = a.length >= size && a != null ? a : (T[]) java.lang.reflect.Array.newInstance(
+                    a.getClass().getComponentType(),
+                    size
+            );
+
+            int nextIndex = 0;
+            for (Node<K, V> current : buckets) {
+                while (current != null) {
+                    r[nextIndex++] = (T) current.value;
+                    current = current.next;
+                }
+            }
+
+            return r;
+        }
+
+        /**
+         * Removes a single instance of the specified value from the {@link HashMap}, if it is present.
+         *
+         * @param o value to be removed from the {@link HashMap}, if present
+         *
+         * @return <tt>true</tt> if an value was removed as a result of this call
+         */
+        @Override public boolean remove(Object o)
+        {
+            for (int x = 0; x < buckets.length; x++) {
+                Node<K, V> current = buckets[x];
+                Node<K, V> previous = null;
+                while (current != null) {
+                    if (current.value == null ? o == null : current.value.equals(o)) {
+                        if (previous != null)
+                            previous.setNext(current.next);
+                        else
+                            buckets[x] = current.next;
+                        size--;
+                        return true;
+                    }
+
+                    previous = current;
+                    current = current.next;
+                }
+            }
+
+            return false;
+        }
+
+        /**
+         * Returns <tt>true</tt> if the {@link HashMap} contains all of the values in the specified collection.
+         *
+         * @param c to be checked for containment in the {@link HashMap}
+         *
+         * @return <tt>true</tt> if the {@link HashMap} contains all of the values in the specified collection.
+         * @see #contains(Object)
+         */
+        @Override public boolean containsAll(Collection<?> c)
+        {
+            if (c == null || c.isEmpty())
+                return false;
+
+            for (Object o : c)
+                if (!HashMap.this.containsValue(o))
+                    return false;
+
+            return true;
+        }
+
+        /**
+         * Removes all of the {@link HashMap}'s values that are also contained in the specified collection. After this
+         * call returns, the {@link HashMap} will contain no values in common with the specified collection.
+         *
+         * @param c collection containing values to be removed from the {@link HashMap}.
+         *
+         * @return <tt>true</tt> if the {@link HashMap} changed as a result of the call.
+         * @see #remove(Object)
+         * @see #contains(Object)
+         */
+        @Override public boolean removeAll(Collection<?> c)
+        {
+            if (c == null || c.isEmpty())
+                return false;
+
+            boolean changed = false;
+            for (int x = 0; x < buckets.length; x++) {
+                Node<K, V> current = buckets[x];
+                Node<K, V> previous = null;
+                while (current != null) {
+                    if (c.contains(current.value)) {
+                        if (previous != null)
+                            previous.setNext(current.next);
+                        else
+                            buckets[x] = current.next;
+                        size--;
+                        changed = true;
+                    }
+
+                    previous = current;
+                    current = current.next;
+                }
+            }
+
+            return changed;
+        }
+
+        /**
+         * Retains only the values in the {@link HashMap} that are contained in the specified collection.  In other
+         * words: removes from the {@link HashMap} all of its values that are not contained in the specified collection.
+         *
+         * @param c collection containing values to be retained in the {@link HashMap}
+         *
+         * @return <tt>true</tt> if the {@link HashMap} changed as a result of the call
+         * @see #remove(Object)
+         * @see #contains(Object)
+         */
+        @Override public boolean retainAll(Collection<?> c)
+        {
+            if (c == null || c.isEmpty())
+                return false;
+
+            boolean changed = false;
+            for (int x = 0; x < buckets.length; x++) {
+                Node<K, V> current = buckets[x];
+                Node<K, V> previous = null;
+                while (current != null) {
+                    if (!c.contains(current.value)) {
+                        if (previous != null)
+                            previous.setNext(current.next);
+                        else
+                            buckets[x] = current.next;
+                        size--;
+                        changed = true;
+                    }
+
+                    previous = current;
+                    current = current.next;
+                }
+            }
+
+            return changed;
+        }
+
+        /**
+         * Removes all of the values from the {@link HashMap}.
+         */
+        @Override public void clear()
+        {
+            HashMap.this.clear();
+        }
+
+        /**
+         * Unsupported operation.
+         *
+         * @throws UnsupportedOperationException
+         */
+        @Override public boolean add(V v)
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        /**
+         * Unsupported operation.
+         *
+         * @throws UnsupportedOperationException
+         */
+        @Override public boolean addAll(Collection<? extends V> c)
+        {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+
+    /**
+     * Returns a {@link Set} view of the keys contained in this map. The set is backed by the map, so changes to the
+     * map
+     * are reflected in the set, and vice-versa.  If the map is modified while an iteration over the set is in progress
+     * (except through the iterator's own <tt>remove</tt> operation), the results of the iteration are undefined.  The
+     * set supports element removal, which removes the corresponding mapping from the map, via the
+     * <tt>Iterator.remove</tt>, <tt>Set.remove</tt>, <tt>removeAll</tt>, <tt>retainAll</tt>, and <tt>clear</tt>
+     * operations.  It does not support the <tt>add</tt> or <tt>addAll</tt> operations.
+     *
+     * @return a set view of the keys contained in this map
+     */
+    @Override public Set<K> keySet()
+    {
+        if (cachedKeySet == null)
+            cachedKeySet = new HashMapKeySet();
+
+        return cachedKeySet;
+    }
+
+    /**
+     * Set backed by the {@link HashMap}. Changed made to the {@link HashMap} are reflected in the
+     * {@link HashMapKeySet} and vice versa. The same instance of {@link HashMapKeySet} should be
+     * returned on multiple calls to the {@link HashMap#keySet()} method.
+     */
+    private class HashMapKeySet implements Set<K> {
+
+        /**
+         * Returns the number of keys in the {@link HashMap}.
+         *
+         * @return the number of keys in the {@link HashMap}.
+         */
+        @Override public int size()
+        {
+            return HashMap.this.size;
+        }
+
+        /**
+         * Returns <tt>true</tt> if the {@link HashMap} contains no keys.
+         *
+         * @return <tt>true</tt> if the {@link HashMap} contains no keys
+         */
+        @Override public boolean isEmpty()
+        {
+            return HashMap.this.size == 0;
+        }
+
+        /**
+         * Returns <tt>true</tt> if the {@link HashMap} contains the specified key.
+         *
+         * @param o key whose presence in the {@link HashMap} is to be tested
+         *
+         * @return <tt>true</tt> if the {@link HashMap} contains the specified key
+         */
+        @Override public boolean contains(Object o)
+        {
+            return getNode(hash(o), o) != null;
+        }
+
+        /**
+         * Returns an iterator over the keys in the {@link HashMap}.
+         *
+         * @return an iterator over the keys in the {@link HashMap}
+         */
+        @Override public Iterator<K> iterator()
+        {
+            return new HashMapKeyIterator();
+        }
+
+        /**
+         * Iterator implementation extending from {@link HashMapIterator} allowing for easy iteration of the keys
+         * in the {@link HashMap}.
+         */
+        private final class HashMapKeyIterator extends HashMapIterator<K> {
+
+            /**
+             * Returns the next key in the iteration.
+             *
+             * @return the next key in the iteration
+             * @throws NoSuchElementException if the iteration has no more keys
+             */
+            @Override public K next()
+            {
+                return super.nextNode().key;
+            }
+        }
+
+        /**
+         * Returns an array containing all of the keys in the {@link HashMap}. If the {@link HashMap} makes any guarantees as to what
+         * order its keys are returned by its iterator, this method must return the keys in the same order.
+         *
+         * @return an array containing all the keys in the {@link HashMap}
+         */
+        @Override public Object[] toArray()
+        {
+            int nextIndex = 0;
+            Object[] result = new Object[size];
+            for (Node<K, V> current : buckets) {
+                while (current != null) {
+                    result[nextIndex++] = current.key;
+                    current = current.next;
+                }
+            }
+
+            return result;
+        }
+
+        /**
+         * Returns an array containing all of the keys in the {@link HashMap}; the runtime type of the returned array is that
+         * of the specified array. If the set fits in the specified array, it is returned therein. Otherwise, a new
+         * array is allocated with the runtime type of the specified array and the size of the {@link HashMap}.
+         *
+         * @param a the array into which the keys of the {@link HashMap} are to be stored, if it is big enough; otherwise, a
+         *          new array of the same runtime type is allocated for this purpose.
+         *
+         * @return an array containing all the keys in the {@link HashMap}
+         * @throws ArrayStoreException if the runtime type of the specified array is not a supertype of the runtime
+         *                             type of every key in the {@link HashMap}
+         */
+        @Override public <T> T[] toArray(T[] a)
+        {
+            int size = size();
+            T[] r = a == null || (a != null && a.length < size) ? (T[]) java.lang.reflect.Array.newInstance(
+                    a.getClass().getComponentType(),
+                    size
+            ) : a;
+
+            int nextIndex = 0;
+            for (Node<K, V> current : buckets) {
+                while (current != null) {
+                    r[nextIndex++] = (T) current.key;
+                    current = current.next;
+                }
+            }
+
+            return r;
+        }
+
+        /**
+         * Removes the specified key from the {@link HashMap} if it is present More formally, removes an key <tt>e</tt>
+         * such that <tt>(o==null ? e==null : o.equals(e))</tt>, if the {@link HashMap} contains such an key.  Returns
+         * <tt>true</tt> if the {@link HashMap} contained the key (or equivalently, if the {@link HashMap} changed as a result of the
+         * call).  (the {@link HashMap} will not contain the key once the call returns.)
+         *
+         * @param o object to be removed from the {@link HashMap}, if present
+         *
+         * @return <tt>true</tt> if the {@link HashMap} contained the specified key
+         */
+        @Override public boolean remove(Object o)
+        {
+            return removeNode(hash(o), o) != null;
+        }
+
+        /**
+         * Returns <tt>true</tt> if the {@link HashMap} contains all of the keys of the specified collection.  If the
+         * specified collection is also a set, this method returns <tt>true</tt> if it is a <i>subset</i> of the {@link HashMap}.
+         *
+         * @param c collection to be checked for containment in the {@link HashMap}
+         *
+         * @return <tt>true</tt> if the {@link HashMap} contains all of the keys of the specified collection
+         * @see #contains(Object)
+         */
+        @Override public boolean containsAll(Collection<?> c)
+        {
+            if (c == null || c.isEmpty()) {
+                return true;
+            }
+
+            for (Object o : c)
+                if (!contains(o))
+                    return false;
+
+            return true;
+        }
+
+        /**
+         * Retains only the keys in the {@link HashMap} that are contained in the specified collection. In other words,
+         * removes from the {@link HashMap} all of its keys that are not contained in the specified collection .
+         * If the specified collection is also a set, this operation effectively modifies the {@link HashMap} so that its value
+         * is the <i>intersection</i> of the two sets.
+         *
+         * @param c collection containing keys to be retained in the {@link HashMap}
+         *
+         * @return <tt>true</tt> if the {@link HashMap} changed as a result of the call
+         * @see #remove(Object)
+         */
+        @Override public boolean retainAll(Collection<?> c)
+        {
+            if (c == null || c.isEmpty()) {
+                clear();
+                return true;
+            }
+
+            boolean changed = false;
+            for (int x = 0; x < buckets.length; x++) {
+                Node<K, V> current = buckets[x];
+                Node<K, V> previous = null;
+                while (current != null) {
+                    if (!c.contains(current.key)) {
+                        if (previous != null)
+                            previous.setNext(current.next);
+                        else
+                            buckets[x] = null;
+                        size--;
+                        changed = true;
+                    }
+
+                    previous = current;
+                    current = current.next;
+                }
+            }
+
+            return changed;
+        }
+
+        /**
+         * Removes from the {@link HashMap} all of its keys that are contained in the specified collection (optional
+         * operation).  If the specified collection is also a set, this operation effectively modifies the {@link HashMap} so that
+         * its value is the <i>asymmetric set difference</i> of the two sets.
+         *
+         * @param c collection containing keys to be removed from the {@link HashMap}
+         *
+         * @return <tt>true</tt> if the {@link HashMap} changed as a result of the call
+         * @see #remove(Object)
+         * @see #contains(Object)
+         */
+        @Override public boolean removeAll(Collection<?> c)
+        {
+            if (c == null || c.isEmpty()) {
+                return false;
+            }
+
+            boolean changed = false;
+            for (Object o : c) {
+                if (remove(o)) {
+                    changed = true;
+                }
+            }
+
+            return changed;
+        }
+
+        /**
+         * Removes all of the keys from the {@link HashMap}.
+         */
+        @Override public void clear()
+        {
+            HashMap.this.clear();
+        }
+
+        /**
+         * Unsupported operation.
+         */
+        @Override public boolean addAll(Collection<? extends K> c)
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        /**
+         * Unsupported operation.
+         */
+        @Override public boolean add(K k)
+        {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    /**
+     * Returns a {@link Set} view of the mappings contained in this map. The set is backed by the map, so changes to
+     * the map are reflected in the set, and vice-versa.  If the map is modified while an iteration over the set is in
+     * progress (except through the iterator's own <tt>remove</tt> operation, or through the <tt>setValue</tt>
+     * operation on a map entry returned by the iterator) the results of the iteration are undefined.  The set supports element
+     * removal, which removes the corresponding mapping from the map, via the <tt>Iterator.remove</tt>,
+     * <tt>Set.remove</tt>, <tt>removeAll</tt>, <tt>retainAll</tt> and <tt>clear</tt> operations.  It does not support
+     * the <tt>add</tt> or <tt>addAll</tt> operations.
+     *
+     * @return a set view of the mappings contained in this map
+     */
+    @Override public Set<Entry<K, V>> entrySet()
+    {
+        if (cachedEntrySet == null)
+            cachedEntrySet = new HashMapEntrySet();
+
+        return cachedEntrySet;
+    }
+
+    /**
+     * Set backed by the {@link HashMap}. Changed made to the {@link HashMap} are reflected in the
+     * {@link HashMapEntrySet} and vice versa. The same instance of {@link HashMapEntrySet} should be
+     * returned on multiple calls to the {@link HashMap#entrySet()} method.
+     */
+    private class HashMapEntrySet implements Set<Entry<K, V>> {
+
+        /**
+         * Returns the number of entries in this set.
+         *
+         * @return the number of entries in this set.
+         */
+        @Override public int size()
+        {
+            return HashMap.this.size();
+        }
+
+        /**
+         * Returns <tt>true</tt> if this set contains no entries.
+         *
+         * @return <tt>true</tt> if this set contains no entries
+         */
+        @Override public boolean isEmpty()
+        {
+            return HashMap.this.size == 0;
+        }
+
+        /**
+         * Returns <tt>true</tt> if this set contains the specified entry.
+         *
+         * @param o entry whose presence in this set is to be tested
+         *
+         * @return <tt>true</tt> if this set contains the specified entry
+         */
+        @Override public boolean contains(Object o)
+        {
+            Node<K, V> found = nodeFromEntry(o);
+
+            return found != null;
+        }
+
+        /**
+         * Returns an iterator over the entries in this set.  The entries are returned in no particular order.
+         *
+         * @return an iterator over the entries in this set
+         */
+        @Override public Iterator<Entry<K, V>> iterator()
+        {
+            return new HashMapEntryIterator();
+        }
+
+        /**
+         * Iterator implementation extending from {@link HashMapIterator} allowing for easy iteration of the entries
+         * in the {@link HashMap}.
+         */
+        private class HashMapEntryIterator extends HashMapIterator<Entry<K, V>> {
+
+            /**
+             * Returns the next entry in the iteration.
+             *
+             * @return the next entry in the iteration
+             * @throws NoSuchElementException if the iteration has no more entries
+             */
+            @Override public Entry<K, V> next()
+            {
+                return super.nextNode();
+            }
+        }
+
+        /**
+         * Returns an array containing all of the entries in the {@link HashMap}. The resulting array can be modified without
+         * affecting the set.
+         *
+         * @return the array containing all the entries in the {@link HashMap}
+         */
+        @Override public Object[] toArray()
+        {
+            int nextIndex = 0;
+            Object[] result = new Object[size];
+            for (Node<K, V> current : buckets) {
+                while (current != null) {
+                    result[nextIndex++] = current;
+                    current = current.next;
+                }
+            }
+
+            return result;
+        }
+
+        /**
+         * Returns an array containing all of the entries in the {@link HashMap}; the runtime type of the returned array is that
+         * of the specified array. If the set fits in the specified array, it is returned therein. Otherwise, a new
+         * array is allocated with the runtime type of the specified array and the size of the {@link HashMap}.
+         *
+         * @param a the array into which the entries of the {@link HashMap} are to be stored, if it is big enough; otherwise, a
+         *          new array of the same runtime type is allocated for this purpose.
+         *
+         * @return an array containing all the entries in the {@link HashMap}
+         * @throws ArrayStoreException if the runtime type of the specified array is not a supertype of the runtime
+         *                             type of every entry in the {@link HashMap}
+         */
+        @Override public <T> T[] toArray(T[] a)
+        {
+            int size = size();
+            T[] r = a.length >= size && a != null ? a : (T[]) java.lang.reflect.Array.newInstance(
+                    a.getClass().getComponentType(),
+                    size
+            );
+
+            int nextIndex = 0;
+            for (Node<K, V> current : buckets) {
+                while (current != null) {
+                    r[nextIndex++] = (T) current;
+                    current = current.next;
+                }
+            }
+
+            return r;
+        }
+
+        /**
+         * Adds the provided entry to the {@link HashMapEntrySet} when it does not already exist in the set. The entry
+         * is only added when a {@link Node} with the an equal key and value doesn't exist in the set. Null values
+         * cannot be allowed.
+         *
+         * @param entry entry to be added to the {@link HashMap}
+         *
+         * @return <tt>true</tt> if the {@link HashMap} did not already contain the specified entry
+         */
+        @Override public boolean add(Entry<K, V> entry)
+        {
+            if (entry == null || nodeFromEntry(entry) != null)
+                return false;
+
+            K key = entry.getKey();
+            putNode(key.hashCode(), key, entry.getValue(), null);
+            return true;
+        }
+
+        /**
+         * Removes the specified entry from the {@link HashMap} if it is present. More formally, removes an entry <tt>e</tt>
+         * such that <tt>(o==null ? e==null : o.equals(e))</tt>, if the {@link HashMap} contains such an entry.  Returns
+         * <tt>true</tt> if the {@link HashMap} contained the entry (or equivalently, if the {@link HashMap} changed as a result of the
+         * call).
+         *
+         * @param o object to be removed from the {@link HashMap}, if present
+         *
+         * @return <tt>true</tt> if the {@link HashMap} contained the specified entry
+         */
+        @Override public boolean remove(Object o)
+        {
+            if (!(o instanceof Entry))
+                return false;
+
+            Entry<K, V> e = (Entry<K, V>) o;
+
+            for (int x = 0; x < buckets.length; x++) {
+                Node<K, V> current = buckets[x];
+                Node<K, V> previous = null;
+                while (current != null) {
+                    if (current.equals(e)) {
+                        if (previous != null)
+                            previous.setNext(current.next);
+                        else
+                            buckets[x] = null;
+                        size--;
+                        return true;
+                    }
+
+                    previous = current;
+                    current = current.next;
+                }
+            }
+
+            return false;
+        }
+
+        /**
+         * Returns <tt>true</tt> if the {@link HashMap} contains all of the entries of the specified collection.  If the
+         * specified collection is also a set, this method returns <tt>true</tt> if it is a <i>subset</i> of the {@link HashMap}.
+         *
+         * @param c collection to be checked for containment in the {@link HashMap}
+         *
+         * @return <tt>true</tt> if the {@link HashMap} contains all of the entries of the specified collection
+         * @see #contains(Object)
+         */
+        @Override public boolean containsAll(Collection<?> c)
+        {
+            if (c == null || c.isEmpty())
+                return true;
+
+            for (Object o : c)
+                if (!contains(o))
+                    return false;
+
+            return true;
+        }
+
+        /**
+         * Adds all of the entries in the specified collection to the {@link HashMap} if they're not already present.  If the
+         * specified collection is also a set, the <tt>addAll</tt> operation effectively modifies the {@link HashMap} so that its
+         * value is the <i>union</i> of the two sets.  The behavior of this operation is undefined if the specified
+         * collection is modified while the operation is in progress.
+         *
+         * @param c collection containing entries to be added to the {@link HashMap}
+         *
+         * @return <tt>true</tt> if the {@link HashMap} changed as a result of the call
+         * @see #add(Object)
+         */
+        @Override public boolean addAll(Collection<? extends Entry<K, V>> c)
+        {
+            boolean changed = false;
+            if (c != null) {
+                for (Entry<K, V> entry : c) {
+                    if (add(entry)) {
+                        changed = true;
+                    }
+                }
+            }
+
+            return changed;
+        }
+
+        /**
+         * Retains only the entries in the {@link HashMap} that are contained in the specified collection. In other words,
+         * removes
+         * from the {@link HashMap} all of its entries that are not contained in the specified collection . If the specified
+         * collection is also a set, this operation effectively modifies the {@link HashMap} so that its value is the
+         * <i>intersection</i> of the two sets.
+         *
+         * @param c collection containing entries to be retained in the {@link HashMap}
+         *
+         * @return <tt>true</tt> if the {@link HashMap} changed as a result of the call
+         * @see #remove(Object)
+         */
+        @Override public boolean retainAll(Collection<?> c)
+        {
+            if (c == null || c.isEmpty()) {
+                clear();
+                return true;
+            }
+
+            boolean changed = false;
+            for (int x = 0; x < buckets.length; x++) {
+                Node<K, V> current = buckets[x];
+                Node<K, V> previous = null;
+                while (current != null) {
+                    if (!c.contains(current)) {
+                        if (previous != null)
+                            previous.setNext(current.next);
+                        else
+                            buckets[x] = null;
+                        size--;
+                        changed = true;
+                    }
+
+                    previous = current;
+                    current = current.next;
+                }
+            }
+
+            return changed;
+        }
+
+        /**
+         * Removes from the {@link HashMap} all of its entries that are contained in the specified collection.  If the specified
+         * collection is also a set, this operation effectively modifies the {@link HashMap} so that its value is the
+         * <i>asymmetric
+         * set difference</i> of the two sets.
+         *
+         * @param c collection containing entries to be removed from the {@link HashMap}
+         *
+         * @return <tt>true</tt> if the {@link HashMap} changed as a result of the call
+         * @see #remove(Object)
+         * @see #contains(Object)
+         */
+        @Override public boolean removeAll(Collection<?> c)
+        {
+            if (c == null || c.isEmpty()) {
+                return false;
+            }
+
+            boolean changed = false;
+            for (Object o : c) {
+                if (remove(o)) {
+                    changed = true;
+                }
+            }
+
+            return changed;
+        }
+
+        /**
+         * Removes all of the entries from the {@link HashMap}.
+         */
+        @Override public void clear()
+        {
+            HashMap.this.clear();
+        }
+    }
+
+    /**
+     * Returns the current capacity of the {@link HashMap}. The capacity is the number of buckets in the {@link
+     * HashMap}. The capacity will automatically increase depending on the <code>loadFactor</code> of the {@link
+     * HashMap}.
+     *
+     * @return The current capacity.
+     */
+    public int capacity()
+    {
+        return this.buckets.length;
+    }
+
+    /**
+     * Returns the <code>loadFactor</code> used in the {@link HashMap}.  The <code>loadFactor</code> influences how
+     * often the {@link HashMap} is expanded. The {@link HashMap} is expanded when the number of entries equals or
+     * exceeds the <code>capacity * loadFactor</code>.
+     *
+     * @return The <code>loadFactor</code>.
+     */
+    public double getLoadFactor()
+    {
+        return this.loadFactor;
     }
 
     /**
@@ -946,7 +1506,6 @@ public class HashMap<K, V> implements Map<K, V> {
      */
     private Node<K, V> getNode(int hash, Object key)
     {
-
         int bucketIndex = index(hash);
         Node<K, V> current = buckets[bucketIndex];
         while (current != null) {
@@ -1046,622 +1605,5 @@ public class HashMap<K, V> implements Map<K, V> {
     private static int hash(Object key)
     {
         return key == null ? 0 : key.hashCode();
-    }
-
-    /**
-     * Returns a {@link Set} view of the mappings contained in this map. The set is backed by the map, so changes to
-     * the
-     * map are reflected in the set, and vice-versa.  If the map is modified while an iteration over the set is in
-     * progress (except through the iterator's own <tt>remove</tt> operation, or through the <tt>setValue</tt>
-     * operation
-     * on a map entry returned by the iterator) the results of the iteration are undefined.  The set supports element
-     * removal, which removes the corresponding mapping from the map, via the <tt>Iterator.remove</tt>,
-     * <tt>Set.remove</tt>, <tt>removeAll</tt>, <tt>retainAll</tt> and <tt>clear</tt> operations.  It does not support
-     * the <tt>add</tt> or <tt>addAll</tt> operations.
-     *
-     * @return a set view of the mappings contained in this map
-     */
-    @Override
-    public Set<Entry<K, V>> entrySet()
-    {
-        if (cachedEntrySet == null)
-            cachedEntrySet = new HashMapEntrySet();
-
-        return cachedEntrySet;
-    }
-
-    /**
-     * {@link HashMap} backed {@link Set} allowing for {@link Set} operations on the {@link HashMap}.
-     */
-    private class HashMapEntrySet implements Set<Entry<K, V>> {
-
-        /**
-         * Returns the number of elements in this set.
-         *
-         * @return the number of elements in this set.
-         */
-        @Override
-        public int size()
-        {
-            return HashMap.this.size();
-        }
-
-        /**
-         * Returns <tt>true</tt> if this set contains no elements.
-         *
-         * @return <tt>true</tt> if this set contains no elements
-         */
-        @Override
-        public boolean isEmpty()
-        {
-            return HashMap.this.size == 0;
-        }
-
-        /**
-         * Returns <tt>true</tt> if this set contains the specified element.
-         *
-         * @param o element whose presence in this set is to be tested
-         *
-         * @return <tt>true</tt> if this set contains the specified element
-         */
-        @Override
-        public boolean contains(Object o)
-        {
-            Node<K, V> found = nodeFromEntry(o);
-
-            return found != null;
-        }
-
-        /**
-         * Returns an iterator over the elements in this set.  The elements are returned in no particular order.
-         *
-         * @return an iterator over the elements in this set
-         */
-        @Override
-        public Iterator<Entry<K, V>> iterator()
-        {
-            return new HashMapEntryIterator();
-        }
-
-        private class HashMapEntryIterator extends HashMapIterator<Entry<K, V>> {
-            @Override
-            public Entry<K, V> next()
-            {
-                return nextNode();
-            }
-        }
-
-        /**
-         * Returns an array containing all of the elements in this set. The resulting array can be modified without
-         * affecting the set.
-         *
-         * @return the array containing all the elements in this set
-         */
-        @Override
-        public Node<K, V>[] toArray()
-        {
-            int nextIndex = 0;
-            Node<K, V>[] result = (Node<K, V>[]) new Node[size];
-            for (Node<K, V> current : buckets) {
-                while (current != null) {
-                    result[nextIndex++] = current;
-                    current = current.next;
-                }
-            }
-
-            return result;
-        }
-
-        /**
-         * Returns an array containing all of the elements in this set; the runtime type of the returned array is that
-         * of the specified array. If the set fits in the specified array, it is returned therein. Otherwise, a new
-         * array is allocated with the runtime type of the specified array and the size of this set.
-         * <p>
-         * <p>If this set fits in the specified array with room to spare (i.e., the array has more elements than this
-         * set), the element in the array immediately following the end of the set is set to <tt>null</tt>.  (This is
-         * useful in determining the length of this set <i>only</i> if the caller knows that this set does not contain
-         * any null elements.)
-         * <p>
-         * <p>If this set makes any guarantees as to what order its elements are returned by its iterator, this method
-         * must return the elements in the same order.
-         * <p>
-         * This method allows precise control over the runtime type of the output array.
-         * <p>
-         * <p>Suppose <tt>x</tt> is a set known to contain only strings. The following code can be used to dump the set
-         * into a newly allocated array of <tt>String</tt>:
-         * <p>
-         * <pre>
-         *     String[] y = x.toArray(new String[0]);</pre>
-         * <p>
-         *
-         * @param a the array into which the elements of this set are to be stored, if it is big enough; otherwise, a
-         *          new array of the same runtime type is allocated for this purpose.
-         *
-         * @return an array containing all the elements in this set
-         * @throws ArrayStoreException if the runtime type of the specified array is not a supertype of the runtime
-         *                             type
-         *                             of every element in this set
-         */
-        @Override
-        public <T> T[] toArray(T[] a)
-        {
-            int size = size();
-            T[] r = a.length >= size && a != null ? a : (T[]) java.lang.reflect.Array.newInstance(
-                    a.getClass().getComponentType(),
-                    size
-            );
-
-            int nextIndex = 0;
-            for (Node<K, V> current : buckets) {
-                while (current != null) {
-                    r[nextIndex++] = (T) current;
-                    current = current.next;
-                }
-            }
-
-            return r;
-        }
-
-        /**
-         * Adds the provided entry to the {@link HashMapEntrySet} when it does not already exist in the set. The entry
-         * is only added when a {@link Node} with the an equal key and value doesn't exist in the set. Null values
-         * cannot be allowed.
-         *
-         * @param entry element to be added to this set
-         *
-         * @return <tt>true</tt> if this set did not already contain the specified element
-         */
-        @Override
-        public boolean add(Entry<K, V> entry)
-        {
-            if (entry == null || nodeFromEntry(entry) != null)
-                return false;
-
-            K key = entry.getKey();
-            putNode(key.hashCode(), key, entry.getValue(), null);
-            return true;
-        }
-
-        /**
-         * Removes the specified element from this set if it is present. More formally, removes an element <tt>e</tt>
-         * such that <tt>(o==null ? e==null : o.equals(e))</tt>, if this set contains such an element.  Returns
-         * <tt>true</tt> if this set contained the element (or equivalently, if this set changed as a result of the
-         * call).
-         *
-         * @param o object to be removed from this set, if present
-         *
-         * @return <tt>true</tt> if this set contained the specified element
-         */
-        @Override
-        public boolean remove(Object o)
-        {
-            if (!(o instanceof Entry))
-                return false;
-
-            Entry<K, V> e = (Entry<K, V>) o;
-
-            for (int x = 0; x < buckets.length; x++) {
-                Node<K, V> current = buckets[x];
-                Node<K, V> previous = null;
-                while (current != null) {
-                    if (current.equals(e)) {
-                        if (previous != null)
-                            previous.setNext(current.next);
-                        else
-                            buckets[x] = null;
-                        size--;
-                        return true;
-                    }
-
-                    previous = current;
-                    current = current.next;
-                }
-            }
-
-            return false;
-        }
-
-        /**
-         * Returns <tt>true</tt> if this set contains all of the elements of the specified collection.  If the
-         * specified
-         * collection is also a set, this method returns <tt>true</tt> if it is a <i>subset</i> of this set.
-         *
-         * @param c collection to be checked for containment in this set
-         *
-         * @return <tt>true</tt> if this set contains all of the elements of the specified collection
-         * @see #contains(Object)
-         */
-        @Override
-        public boolean containsAll(Collection<?> c)
-        {
-            if (c == null || c.isEmpty())
-                return true;
-
-            for (Object o : c)
-                if (!contains(o))
-                    return false;
-
-            return true;
-        }
-
-        /**
-         * Adds all of the elements in the specified collection to this set if they're not already present.  If the
-         * specified collection is also a set, the <tt>addAll</tt> operation effectively modifies this set so that its
-         * value is the <i>union</i> of the two sets.  The behavior of this operation is undefined if the specified
-         * collection is modified while the operation is in progress.
-         *
-         * @param c collection containing elements to be added to this set
-         *
-         * @return <tt>true</tt> if this set changed as a result of the call
-         * @see #add(Object)
-         */
-        @Override
-        public boolean addAll(Collection<? extends Entry<K, V>> c)
-        {
-            boolean changed = false;
-            if (c != null) {
-                for (Entry<K, V> entry : c) {
-                    if (add(entry)) {
-                        changed = true;
-                    }
-                }
-            }
-
-            return changed;
-        }
-
-        /**
-         * Retains only the elements in this set that are contained in the specified collection. In other words,
-         * removes
-         * from this set all of its elements that are not contained in the specified collection . If the specified
-         * collection is also a set, this operation effectively modifies this set so that its value is the
-         * <i>intersection</i> of the two sets.
-         *
-         * @param c collection containing elements to be retained in this set
-         *
-         * @return <tt>true</tt> if this set changed as a result of the call
-         * @see #remove(Object)
-         */
-        @Override
-        public boolean retainAll(Collection<?> c)
-        {
-            if (c == null || c.isEmpty()) {
-                clear();
-                return true;
-            }
-
-            boolean changed = false;
-            for (int x = 0; x < buckets.length; x++) {
-                Node<K, V> current = buckets[x];
-                Node<K, V> previous = null;
-                while (current != null) {
-                    if (!c.contains(current)) {
-                        if (previous != null)
-                            previous.setNext(current.next);
-                        else
-                            buckets[x] = null;
-                        size--;
-                        changed = true;
-                    }
-
-                    previous = current;
-                    current = current.next;
-                }
-            }
-
-            return changed;
-        }
-
-        /**
-         * Removes from this set all of its elements that are contained in the specified collection.  If the specified
-         * collection is also a set, this operation effectively modifies this set so that its value is the
-         * <i>asymmetric
-         * set difference</i> of the two sets.
-         *
-         * @param c collection containing elements to be removed from this set
-         *
-         * @return <tt>true</tt> if this set changed as a result of the call
-         * @see #remove(Object)
-         * @see #contains(Object)
-         */
-        @Override
-        public boolean removeAll(Collection<?> c)
-        {
-            if (c == null || c.isEmpty()) {
-                return false;
-            }
-
-            boolean changed = false;
-            for (Object o : c) {
-                if (remove(o)) {
-                    changed = true;
-                }
-            }
-
-            return changed;
-        }
-
-        /**
-         * Removes all of the elements from this set. The set will be empty after this call returns.
-         */
-        @Override
-        public void clear()
-        {
-            HashMap.this.clear();
-        }
-    }
-
-    /**
-     * Returns a {@link Set} view of the keys contained in this map. The set is backed by the map, so changes to the
-     * map
-     * are reflected in the set, and vice-versa.  If the map is modified while an iteration over the set is in progress
-     * (except through the iterator's own <tt>remove</tt> operation), the results of the iteration are undefined.  The
-     * set supports element removal, which removes the corresponding mapping from the map, via the
-     * <tt>Iterator.remove</tt>, <tt>Set.remove</tt>, <tt>removeAll</tt>, <tt>retainAll</tt>, and <tt>clear</tt>
-     * operations.  It does not support the <tt>add</tt> or <tt>addAll</tt> operations.
-     *
-     * @return a set view of the keys contained in this map
-     */
-    @Override
-    public Set<K> keySet()
-    {
-        if (cachedKeySet == null)
-            cachedKeySet = new HashMapKeySet();
-
-        return cachedKeySet;
-    }
-
-    /**
-     * {@link HashMap} backed {@link Set} allowing for {@link Set} operations on the keys in the {@link HashMap}.
-     */
-    private class HashMapKeySet implements Set<K> {
-        /**
-         * Returns the number of elements in this set.
-         *
-         * @return the number of elements in this set.
-         */
-        @Override
-        public int size()
-        {
-            return HashMap.this.size;
-        }
-
-        /**
-         * Returns <tt>true</tt> if this set contains no elements.
-         *
-         * @return <tt>true</tt> if this set contains no elements
-         */
-        @Override
-        public boolean isEmpty()
-        {
-            return HashMap.this.size == 0;
-        }
-
-        /**
-         * Returns <tt>true</tt> if this set contains the specified element.
-         *
-         * @param o element whose presence in this set is to be tested
-         *
-         * @return <tt>true</tt> if this set contains the specified element
-         */
-        @Override
-        public boolean contains(Object o)
-        {
-            return getNode(hash(o), o) != null;
-        }
-
-        /**
-         * Returns an iterator over the elements in this set.
-         *
-         * @return an iterator over the elements in this set
-         */
-        @Override
-        public Iterator<K> iterator()
-        {
-            return new HashMapKeyIterator();
-        }
-
-        /**
-         * Implementation of {@link Iterator} allowing iteration over the keys in the nodes in the {@link HashMap} with
-         * minimal overhead.
-         */
-        private final class HashMapKeyIterator extends HashMapIterator<K> {
-            @Override
-            public K next()
-            {
-                return nextNode().key;
-            }
-        }
-
-        /**
-         * Returns an array containing all of the elements in this set. If this set makes any guarantees as to what
-         * order its elements are returned by its iterator, this method must return the elements in the same order.
-         *
-         * @return an array containing all the elements in this set
-         */
-        @Override
-        public Object[] toArray()
-        {
-            int nextIndex = 0;
-            Object[] result = new Object[size];
-            for (Node<K, V> current : buckets) {
-                while (current != null) {
-                    result[nextIndex++] = current.key;
-                    current = current.next;
-                }
-            }
-
-            return result;
-        }
-
-        /**
-         * Returns an array containing all of the elements in this set; the runtime type of the returned array is that
-         * of the specified array. If the set fits in the specified array, it is returned therein. Otherwise, a new
-         * array is allocated with the runtime type of the specified array and the size of this set.
-         *
-         * @param a the array into which the elements of this set are to be stored, if it is big enough; otherwise, a
-         *          new array of the same runtime type is allocated for this purpose.
-         *
-         * @return an array containing all the elements in this set
-         * @throws ArrayStoreException if the runtime type of the specified array is not a supertype of the runtime
-         *                             type
-         *                             of every element in this set
-         */
-        @Override
-        public <T> T[] toArray(T[] a)
-        {
-            int size = size();
-            T[] r = a == null || (a != null && a.length < size) ? (T[]) java.lang.reflect.Array.newInstance(
-                    a.getClass().getComponentType(),
-                    size
-            ) : a;
-
-            int nextIndex = 0;
-            for (Node<K, V> current : buckets) {
-                while (current != null) {
-                    r[nextIndex++] = (T) current.key;
-                    current = current.next;
-                }
-            }
-
-            return r;
-        }
-
-        /**
-         * Removes the specified element from this set if it is present More formally, removes an element <tt>e</tt>
-         * such that <tt>(o==null ? e==null : o.equals(e))</tt>, if this set contains such an element.  Returns
-         * <tt>true</tt> if this set contained the element (or equivalently, if this set changed as a result of the
-         * call).  (This set will not contain the element once the call returns.)
-         *
-         * @param o object to be removed from this set, if present
-         *
-         * @return <tt>true</tt> if this set contained the specified element
-         */
-        @Override
-        public boolean remove(Object o)
-        {
-            return removeNode(hash(o), o) != null;
-        }
-
-        /**
-         * Returns <tt>true</tt> if this set contains all of the elements of the specified collection.  If the
-         * specified
-         * collection is also a set, this method returns <tt>true</tt> if it is a <i>subset</i> of this set.
-         *
-         * @param c collection to be checked for containment in this set
-         *
-         * @return <tt>true</tt> if this set contains all of the elements of the specified collection
-         * @see #contains(Object)
-         */
-        @Override
-        public boolean containsAll(Collection<?> c)
-        {
-            if (c == null || c.isEmpty()) {
-                return true;
-            }
-
-            for (Object o : c)
-                if (!contains(o))
-                    return false;
-
-            return true;
-        }
-
-        /**
-         * Retains only the elements in this set that are contained in the specified collection. In other words,
-         * removes
-         * from this set all of its elements that are not contained in the specified collection . If the specified
-         * collection is also a set, this operation effectively modifies this set so that its value is the
-         * <i>intersection</i> of the two sets.
-         *
-         * @param c collection containing elements to be retained in this set
-         *
-         * @return <tt>true</tt> if this set changed as a result of the call
-         * @see #remove(Object)
-         */
-        @Override
-        public boolean retainAll(Collection<?> c)
-        {
-            if (c == null || c.isEmpty()) {
-                clear();
-                return true;
-            }
-
-            boolean changed = false;
-            for (int x = 0; x < buckets.length; x++) {
-                Node<K, V> current = buckets[x];
-                Node<K, V> previous = null;
-                while (current != null) {
-                    if (!c.contains(current.key)) {
-                        if (previous != null)
-                            previous.setNext(current.next);
-                        else
-                            buckets[x] = null;
-                        size--;
-                        changed = true;
-                    }
-
-                    previous = current;
-                    current = current.next;
-                }
-            }
-
-            return changed;
-        }
-
-        /**
-         * Removes from this set all of its elements that are contained in the specified collection (optional
-         * operation).  If the specified collection is also a set, this operation effectively modifies this set so that
-         * its value is the <i>asymmetric set difference</i> of the two sets.
-         *
-         * @param c collection containing elements to be removed from this set
-         *
-         * @return <tt>true</tt> if this set changed as a result of the call
-         * @see #remove(Object)
-         * @see #contains(Object)
-         */
-        @Override
-        public boolean removeAll(Collection<?> c)
-        {
-            if (c == null || c.isEmpty()) {
-                return false;
-            }
-
-            boolean changed = false;
-            for (Object o : c) {
-                if (remove(o)) {
-                    changed = true;
-                }
-            }
-
-            return changed;
-        }
-
-        /**
-         * Removes all of the elements from this set. The set will be empty after this call returns.
-         */
-        @Override
-        public void clear()
-        {
-            HashMap.this.clear();
-        }
-
-        /**
-         * Unsupported operation.
-         */
-        @Override
-        public boolean addAll(Collection<? extends K> c)
-        {
-            throw new UnsupportedOperationException();
-        }
-
-        /**
-         * Unsupported operation.
-         */
-        @Override
-        public boolean add(K k)
-        {
-            throw new UnsupportedOperationException();
-        }
     }
 }

@@ -4,6 +4,7 @@ import com.nitorcreations.junit.runners.NestedRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import sun.awt.SunToolkit;
 
 import java.util.*;
 import java.util.Map.Entry;
