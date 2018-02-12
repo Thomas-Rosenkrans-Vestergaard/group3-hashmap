@@ -16,41 +16,48 @@ public class HashMapTest {
     private HashMap<Integer, Integer> map;
 
     @Before
-    public void setUp() {
+    public void setUp()
+    {
         this.map = new HashMap<>();
     }
 
     @Test
-    public void constructorCapacity() throws Exception {
+    public void constructorCapacity() throws Exception
+    {
         assertEquals(16, map.capacity());
         map = new HashMap<>(20);
         assertEquals(20, map.capacity());
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void constructorCapacityThrowsIllegalArgumentException() throws Exception {
+    public void constructorCapacityThrowsIllegalArgumentException() throws Exception
+    {
         map = new HashMap<>(1);
     }
 
     @Test
-    public void constructorLoadFactor() throws Exception {
+    public void constructorLoadFactor() throws Exception
+    {
         assertEquals(0.75, map.getLoadFactor(), 0.0001);
         map = new HashMap<>(0.80);
         assertEquals(0.80, map.getLoadFactor(), 0.0001);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void constructorLoadFactorThrowsIllegalArgumentExceptionLowerBound() throws Exception {
+    public void constructorLoadFactorThrowsIllegalArgumentExceptionLowerBound() throws Exception
+    {
         map = new HashMap<>(0.0);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void constructorLoadFactorThrowsIllegalArgumentExceptionUpperBound() throws Exception {
+    public void constructorLoadFactorThrowsIllegalArgumentExceptionUpperBound() throws Exception
+    {
         map = new HashMap<>(1.00001);
     }
 
     @Test
-    public void constructorMap() throws Exception {
+    public void constructorMap() throws Exception
+    {
         Map<Integer, Integer> parameter = new java.util.HashMap<>();
         parameter.put(0, 0);
         parameter.put(1, 1);
@@ -63,7 +70,8 @@ public class HashMapTest {
     }
 
     @Test
-    public void size() throws Exception {
+    public void size() throws Exception
+    {
         assertEquals(0, map.size());
         map.put(0, 0);
         assertEquals(1, map.size());
@@ -74,7 +82,8 @@ public class HashMapTest {
     }
 
     @Test
-    public void isEmpty() throws Exception {
+    public void isEmpty() throws Exception
+    {
         assertTrue(map.isEmpty());
         map.put(0, 0);
         assertFalse(map.isEmpty());
@@ -83,7 +92,8 @@ public class HashMapTest {
     }
 
     @Test
-    public void containsKey() throws Exception {
+    public void containsKey() throws Exception
+    {
         assertFalse(map.containsKey(0));
         assertFalse(map.containsKey(null));
         map.put(0, 0);
@@ -97,7 +107,8 @@ public class HashMapTest {
     }
 
     @Test
-    public void containsValue() throws Exception {
+    public void containsValue() throws Exception
+    {
         assertFalse(map.containsValue(1));
         assertFalse(map.containsValue(null));
         map.put(0, 1);
@@ -111,7 +122,8 @@ public class HashMapTest {
     }
 
     @Test
-    public void get() throws Exception {
+    public void get() throws Exception
+    {
         assertNull(map.get(0));
         assertNull(map.get(null));
         map.put(0, 15);
@@ -121,7 +133,8 @@ public class HashMapTest {
     }
 
     @Test
-    public void put() throws Exception {
+    public void put() throws Exception
+    {
         assertFalse(map.containsKey(0));
         assertFalse(map.containsKey(null));
         map.put(0, 1);
@@ -136,7 +149,8 @@ public class HashMapTest {
     }
 
     @Test
-    public void remove() throws Exception {
+    public void remove() throws Exception
+    {
         map.put(0, 250);
         map.put(null, 32);
         assertTrue(map.containsKey(0));
@@ -146,7 +160,8 @@ public class HashMapTest {
     }
 
     @Test
-    public void putAll() throws Exception {
+    public void putAll() throws Exception
+    {
         java.util.HashMap<Integer, Integer> parameter = new java.util.HashMap<>();
         parameter.put(0, 0);
         parameter.put(1, 1);
@@ -159,7 +174,8 @@ public class HashMapTest {
     }
 
     @Test
-    public void clear() throws Exception {
+    public void clear() throws Exception
+    {
         map.put(0, 0);
         map.put(1, 1);
         assertTrue(map.containsKey(0));
@@ -170,7 +186,8 @@ public class HashMapTest {
     }
 
     @Test
-    public void values() throws Exception {
+    public void values() throws Exception
+    {
         map.put(0, 0);
         map.put(1, 1);
         map.put(2, 2);
@@ -188,13 +205,15 @@ public class HashMapTest {
         private Collection<Integer> values;
 
         @Before
-        public void setUp() {
+        public void setUp()
+        {
             map = new HashMap<>();
             values = map.values();
         }
 
         @Test
-        public void size() throws Exception {
+        public void size() throws Exception
+        {
             assertEquals(0, values.size());
             map.put(0, 0);
             assertEquals(1, values.size());
@@ -203,7 +222,8 @@ public class HashMapTest {
         }
 
         @Test
-        public void isEmpty() throws Exception {
+        public void isEmpty() throws Exception
+        {
             assertTrue(values.isEmpty());
             map.put(0, 0);
             assertFalse(values.isEmpty());
@@ -212,7 +232,8 @@ public class HashMapTest {
         }
 
         @Test
-        public void contains() throws Exception {
+        public void contains() throws Exception
+        {
             assertFalse(values.contains(5));
             map.put(0, 5);
             assertTrue(values.contains(5));
@@ -227,7 +248,8 @@ public class HashMapTest {
             private Iterator<Integer> it;
 
             @Before
-            public void setUp() {
+            public void setUp()
+            {
                 map = new HashMap<>();
                 map.put(0, 0);
                 map.put(1, 1);
@@ -237,7 +259,8 @@ public class HashMapTest {
             }
 
             @Test
-            public void hasNext() throws Exception {
+            public void hasNext() throws Exception
+            {
                 int counter = 0;
                 while (it.hasNext() == true) {
                     Integer actual = it.next();
@@ -249,7 +272,8 @@ public class HashMapTest {
             }
 
             @Test
-            public void next() throws Exception {
+            public void next() throws Exception
+            {
                 int counter = 0;
                 while (it.hasNext() == true) {
                     Integer actual = it.next();
@@ -261,7 +285,8 @@ public class HashMapTest {
             }
 
             @Test(expected = NoSuchElementException.class)
-            public void nextThrowsNoSuchElementException() throws Exception {
+            public void nextThrowsNoSuchElementException() throws Exception
+            {
                 it.next();
                 it.next();
                 it.next();
@@ -269,7 +294,8 @@ public class HashMapTest {
             }
 
             @Test
-            public void remove() throws Exception {
+            public void remove() throws Exception
+            {
                 int counter = 0;
                 while (it.hasNext() == true) {
                     it.next();
@@ -282,13 +308,15 @@ public class HashMapTest {
             }
 
             @Test(expected = IllegalStateException.class)
-            public void removeThrowsIllegalStateException() throws Exception {
+            public void removeThrowsIllegalStateException() throws Exception
+            {
                 it.remove();
             }
         }
 
         @Test
-        public void toArray() throws Exception {
+        public void toArray() throws Exception
+        {
             int sum = 10;
 
             map.put(0, 0);
@@ -308,7 +336,8 @@ public class HashMapTest {
         }
 
         @Test
-        public void toArrayArgument() throws Exception {
+        public void toArrayArgument() throws Exception
+        {
             int sum = 20;
 
             map.put(0, 0);
@@ -337,7 +366,8 @@ public class HashMapTest {
         }
 
         @Test
-        public void remove() throws Exception {
+        public void remove() throws Exception
+        {
             map.put(0, 0);
             map.put(1, null);
             assertTrue(values.contains(0));
@@ -349,7 +379,8 @@ public class HashMapTest {
         }
 
         @Test
-        public void containsAll() throws Exception {
+        public void containsAll() throws Exception
+        {
             assertFalse(values.containsAll(null));
             assertFalse(values.containsAll(new ArrayList<>()));
 
@@ -367,17 +398,20 @@ public class HashMapTest {
         }
 
         @Test(expected = UnsupportedOperationException.class)
-        public void add() throws Exception {
+        public void add() throws Exception
+        {
             values.add(5);
         }
 
         @Test(expected = UnsupportedOperationException.class)
-        public void addAll() throws Exception {
+        public void addAll() throws Exception
+        {
             values.add(5);
         }
 
         @Test
-        public void removeAll() throws Exception {
+        public void removeAll() throws Exception
+        {
             assertFalse(values.removeAll(null));
             assertFalse(values.removeAll(new ArrayList<>()));
 
@@ -398,7 +432,8 @@ public class HashMapTest {
         }
 
         @Test
-        public void retainAll() throws Exception {
+        public void retainAll() throws Exception
+        {
             assertFalse(values.retainAll(null));
             assertFalse(values.retainAll(new ArrayList<>()));
 
@@ -421,7 +456,8 @@ public class HashMapTest {
         }
 
         @Test
-        public void clear() throws Exception {
+        public void clear() throws Exception
+        {
             map.put(0, 0);
             map.put(1, 1);
             map.put(2, 2);
@@ -435,21 +471,24 @@ public class HashMapTest {
     }
 
     @Test
-    public void capacity() throws Exception {
+    public void capacity() throws Exception
+    {
         assertEquals(16, map.capacity());
         map = new HashMap<>(32);
         assertEquals(32, map.capacity());
     }
 
     @Test
-    public void getLoadFactor() throws Exception {
+    public void getLoadFactor() throws Exception
+    {
         assertEquals(0.75, map.getLoadFactor(), 0.0001);
         map = new HashMap<>(0.1);
         assertEquals(0.1, map.getLoadFactor(), 0.0001);
     }
 
     @Test
-    public void canHandleCollisions() throws Exception {
+    public void canHandleCollisions() throws Exception
+    {
         map = new HashMap<>(10);
 
         map.put(7, 1);
@@ -468,7 +507,8 @@ public class HashMapTest {
     }
 
     @Test
-    public void canExpand() throws Exception {
+    public void canExpand() throws Exception
+    {
         map = new HashMap<>(4);
         assertEquals(4, map.capacity());
         map.put(1, 1);
@@ -478,7 +518,8 @@ public class HashMapTest {
     }
 
     @Test
-    public void entrySet() throws Exception {
+    public void entrySet() throws Exception
+    {
         assertSame(map.entrySet(), map.entrySet());
     }
 
@@ -487,18 +528,21 @@ public class HashMapTest {
         private HashMap<Integer, Integer> map;
         private Set<Map.Entry<Integer, Integer>> set;
 
-        private HashMap.Node<Integer, Integer> pair(Integer key, Integer value) {
+        private HashMap.Node<Integer, Integer> pair(Integer key, Integer value)
+        {
             return new HashMap.Node<>(key, value);
         }
 
         @Before
-        public void setUp() {
+        public void setUp()
+        {
             map = new HashMap<>();
             set = map.entrySet();
         }
 
         @Test
-        public void size() {
+        public void size()
+        {
             assertEquals(0, map.size());
             assertEquals(0, set.size());
 
@@ -510,7 +554,8 @@ public class HashMapTest {
         }
 
         @Test
-        public void isEmpty() {
+        public void isEmpty()
+        {
             assertTrue(set.isEmpty());
             assertTrue(map.isEmpty());
 
@@ -521,7 +566,8 @@ public class HashMapTest {
         }
 
         @Test
-        public void contains() {
+        public void contains()
+        {
             assertFalse(set.contains(pair(0, 0)));
             assertFalse(set.contains(pair(1, 1)));
 
@@ -542,7 +588,8 @@ public class HashMapTest {
             private Iterator<Entry<Integer, Integer>> it;
 
             @Before
-            public void setUp() {
+            public void setUp()
+            {
                 map = new HashMap<>();
                 map.put(0, 0);
                 map.put(1, 1);
@@ -552,7 +599,8 @@ public class HashMapTest {
             }
 
             @Test
-            public void hasNext() throws Exception {
+            public void hasNext() throws Exception
+            {
                 int counter = 0;
                 while (it.hasNext() == true) {
                     Integer actual = it.next().getKey();
@@ -564,7 +612,8 @@ public class HashMapTest {
             }
 
             @Test
-            public void next() throws Exception {
+            public void next() throws Exception
+            {
                 int counter = 0;
                 while (it.hasNext() == true) {
                     Integer actual = it.next().getKey();
@@ -576,7 +625,8 @@ public class HashMapTest {
             }
 
             @Test(expected = NoSuchElementException.class)
-            public void nextThrowsNoSuchElementException() throws Exception {
+            public void nextThrowsNoSuchElementException() throws Exception
+            {
                 it.next();
                 it.next();
                 it.next();
@@ -584,7 +634,8 @@ public class HashMapTest {
             }
 
             @Test
-            public void remove() throws Exception {
+            public void remove() throws Exception
+            {
                 int counter = 0;
                 while (it.hasNext() == true) {
                     it.next();
@@ -597,13 +648,15 @@ public class HashMapTest {
             }
 
             @Test(expected = IllegalStateException.class)
-            public void removeThrowsIllegalStateException() throws Exception {
+            public void removeThrowsIllegalStateException() throws Exception
+            {
                 it.remove();
             }
         }
 
         @Test
-        public void toArray() throws Exception {
+        public void toArray() throws Exception
+        {
             assertEquals(0, set.toArray().length);
             assertEquals(0, set.size());
 
@@ -616,7 +669,8 @@ public class HashMapTest {
         }
 
         @Test
-        public void toArrayT() throws Exception {
+        public void toArrayT() throws Exception
+        {
             set.toArray((HashMap.Node<Integer, Integer>[]) new HashMap.Node[0]);
 
             assertEquals(0, set.toArray((HashMap.Node<Integer, Integer>[]) new HashMap.Node[0]).length);
@@ -634,7 +688,8 @@ public class HashMapTest {
         }
 
         @Test
-        public void add() throws Exception {
+        public void add() throws Exception
+        {
             assertFalse(set.contains(pair(0, 0)));
             assertFalse(map.containsKey(0));
             set.add(pair(0, 0));
@@ -643,7 +698,8 @@ public class HashMapTest {
         }
 
         @Test
-        public void remove() throws Exception {
+        public void remove() throws Exception
+        {
             set.add(pair(1, 1));
             set.add(pair(11, 11));
 
@@ -657,7 +713,8 @@ public class HashMapTest {
         }
 
         @Test
-        public void containsAll() throws Exception {
+        public void containsAll() throws Exception
+        {
             set.add(pair(0, 0));
             set.add(pair(1, 1));
 
@@ -680,7 +737,8 @@ public class HashMapTest {
         }
 
         @Test
-        public void addAll() throws Exception {
+        public void addAll() throws Exception
+        {
             Collection<HashMap.Node<Integer, Integer>> c;
 
             c = new ArrayList<>();
@@ -699,7 +757,8 @@ public class HashMapTest {
         }
 
         @Test
-        public void retainAll() throws Exception {
+        public void retainAll() throws Exception
+        {
             set.add(pair(0, 0));
             set.add(pair(1, 1));
             set.add(pair(2, 2));
@@ -728,7 +787,8 @@ public class HashMapTest {
         }
 
         @Test
-        public void removeAll() {
+        public void removeAll()
+        {
             set.add(pair(0, 0));
             set.add(pair(1, 1));
             set.add(pair(2, 2));
@@ -750,7 +810,8 @@ public class HashMapTest {
         }
 
         @Test
-        public void clear() throws Exception {
+        public void clear() throws Exception
+        {
             set.add(pair(0, 0));
             assertFalse(set.isEmpty());
             set.clear();
@@ -759,7 +820,8 @@ public class HashMapTest {
     }
 
     @Test
-    public void keySet() throws Exception {
+    public void keySet() throws Exception
+    {
         assertSame(map.keySet(), map.keySet());
     }
 
@@ -769,13 +831,15 @@ public class HashMapTest {
         private Set<Integer> set;
 
         @Before
-        public void setUp() {
+        public void setUp()
+        {
             map = new HashMap<>();
             set = map.keySet();
         }
 
         @Test
-        public void size() {
+        public void size()
+        {
             assertEquals(0, map.size());
             assertEquals(0, set.size());
             map.put(1, 20);
@@ -784,7 +848,8 @@ public class HashMapTest {
         }
 
         @Test
-        public void isEmpty() {
+        public void isEmpty()
+        {
             assertTrue(set.isEmpty());
             assertTrue(map.isEmpty());
 
@@ -795,7 +860,8 @@ public class HashMapTest {
         }
 
         @Test
-        public void contains() throws Exception {
+        public void contains() throws Exception
+        {
             map.put(0, 0);
             assertTrue(set.contains(0));
             assertFalse(set.contains(1));
@@ -808,7 +874,8 @@ public class HashMapTest {
             private Iterator<Integer> it;
 
             @Before
-            public void setUp() {
+            public void setUp()
+            {
                 map = new HashMap<>();
                 map.put(0, 0);
                 map.put(1, 1);
@@ -818,7 +885,8 @@ public class HashMapTest {
             }
 
             @Test
-            public void hasNext() throws Exception {
+            public void hasNext() throws Exception
+            {
                 int counter = 0;
                 while (it.hasNext() == true) {
                     Integer actual = it.next();
@@ -830,7 +898,8 @@ public class HashMapTest {
             }
 
             @Test
-            public void next() throws Exception {
+            public void next() throws Exception
+            {
                 int counter = 0;
                 while (it.hasNext() == true) {
                     Integer actual = it.next();
@@ -842,7 +911,8 @@ public class HashMapTest {
             }
 
             @Test(expected = NoSuchElementException.class)
-            public void nextThrowsNoSuchElementException() throws Exception {
+            public void nextThrowsNoSuchElementException() throws Exception
+            {
                 it.next();
                 it.next();
                 it.next();
@@ -850,7 +920,8 @@ public class HashMapTest {
             }
 
             @Test
-            public void remove() throws Exception {
+            public void remove() throws Exception
+            {
                 int counter = 0;
                 while (it.hasNext() == true) {
                     it.next();
@@ -863,13 +934,15 @@ public class HashMapTest {
             }
 
             @Test(expected = IllegalStateException.class)
-            public void removeThrowsIllegalStateException() throws Exception {
+            public void removeThrowsIllegalStateException() throws Exception
+            {
                 it.remove();
             }
         }
 
         @Test
-        public void toArray() throws Exception {
+        public void toArray() throws Exception
+        {
             assertEquals(0, set.toArray().length);
 
             map.put(0, 0);
@@ -884,7 +957,8 @@ public class HashMapTest {
         }
 
         @Test
-        public void toArrayT() throws Exception {
+        public void toArrayT() throws Exception
+        {
             assertEquals(0, set.toArray(new Long[0]).length);
             assertEquals(0, set.size());
 
@@ -899,7 +973,8 @@ public class HashMapTest {
         }
 
         @Test
-        public void remove() throws Exception {
+        public void remove() throws Exception
+        {
             assertFalse(set.remove(0));
             map.put(0, 0);
             assertTrue(set.contains(0));
@@ -908,7 +983,8 @@ public class HashMapTest {
         }
 
         @Test
-        public void containsAll() throws Exception {
+        public void containsAll() throws Exception
+        {
             assertTrue(set.containsAll(null));
 
             map.put(0, 0);
@@ -931,7 +1007,8 @@ public class HashMapTest {
         }
 
         @Test
-        public void retainAll() throws Exception {
+        public void retainAll() throws Exception
+        {
             map.put(0, 0);
             assertFalse(set.isEmpty());
             assertTrue(set.retainAll(null));
@@ -955,7 +1032,8 @@ public class HashMapTest {
         }
 
         @Test
-        public void removeAll() throws Exception {
+        public void removeAll() throws Exception
+        {
             map.put(0, 0);
             map.put(1, 1);
             map.put(2, 2);
@@ -974,7 +1052,8 @@ public class HashMapTest {
         }
 
         @Test
-        public void clear() throws Exception {
+        public void clear() throws Exception
+        {
             map.put(0, 0);
             map.put(1, 1);
 

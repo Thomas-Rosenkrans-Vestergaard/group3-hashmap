@@ -49,7 +49,8 @@ public class HashMap<K, V> implements Map<K, V> {
     /**
      * Creates a new empty HashMap.
      */
-    public HashMap() {
+    public HashMap()
+    {
         this(DEFAULT_CAPACITY, DEFAULT_LOAD_FACTOR);
     }
 
@@ -58,7 +59,8 @@ public class HashMap<K, V> implements Map<K, V> {
      *
      * @param capacity The <code>capacity</code> is the number of buckets used.
      */
-    public HashMap(int capacity) {
+    public HashMap(int capacity)
+    {
         this(capacity, DEFAULT_LOAD_FACTOR);
     }
 
@@ -70,7 +72,8 @@ public class HashMap<K, V> implements Map<K, V> {
      *                   product of
      *                   the load factor and the current capacity, the hash table is expanded.
      */
-    public HashMap(double loadFactor) {
+    public HashMap(double loadFactor)
+    {
         this(DEFAULT_CAPACITY, loadFactor);
     }
 
@@ -84,7 +87,8 @@ public class HashMap<K, V> implements Map<K, V> {
      * @throws IllegalArgumentException When the provided <code>loadFactor</code> is outside the range <code>0 <
      *                                  loadFactor <= 1</code>.
      */
-    public HashMap(int capacity, double loadFactor) {
+    public HashMap(int capacity, double loadFactor)
+    {
         if (capacity < 2)
             throw new IllegalArgumentException("Capacity must be greater than 2.");
 
@@ -104,7 +108,8 @@ public class HashMap<K, V> implements Map<K, V> {
      *
      * @param map The map containing the entries to insert into the {@link HashMapIterator}.
      */
-    public HashMap(Map<? extends K, ? extends V> map) {
+    public HashMap(Map<? extends K, ? extends V> map)
+    {
         this();
         this.putAll(map);
     }
@@ -145,7 +150,8 @@ public class HashMap<K, V> implements Map<K, V> {
          * @param value The value of the {@link Node}.
          * @param next  The next entry in the linked list bucket of this {@link Node}.
          */
-        public Node(int hash, K key, V value, Node<K, V> next) {
+        public Node(int hash, K key, V value, Node<K, V> next)
+        {
             this.hash = hash;
             this.key = key;
             this.value = value;
@@ -158,7 +164,8 @@ public class HashMap<K, V> implements Map<K, V> {
          * @param key   The key of the {@link Node}.
          * @param value The value of the {@link Node}.
          */
-        public Node(K key, V value) {
+        public Node(K key, V value)
+        {
             this(hash(key), key, value, null);
         }
 
@@ -167,7 +174,8 @@ public class HashMap<K, V> implements Map<K, V> {
          *
          * @return The key of the {@link Node}.
          */
-        public K getKey() {
+        public K getKey()
+        {
             return this.key;
         }
 
@@ -176,7 +184,8 @@ public class HashMap<K, V> implements Map<K, V> {
          *
          * @return The value of the {@link Node}.
          */
-        public V getValue() {
+        public V getValue()
+        {
             return this.value;
         }
 
@@ -187,7 +196,8 @@ public class HashMap<K, V> implements Map<K, V> {
          *
          * @return The old value.
          */
-        public V setValue(V value) {
+        public V setValue(V value)
+        {
             V before = this.value;
             this.value = value;
             return before;
@@ -198,12 +208,14 @@ public class HashMap<K, V> implements Map<K, V> {
          *
          * @param next The new reference.
          */
-        void setNext(Node<K, V> next) {
+        void setNext(Node<K, V> next)
+        {
             this.next = next;
         }
 
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(Object o)
+        {
             if (this == o) return true;
             if (!(o instanceof Entry)) return false;
             Entry<?, ?> entry = (Entry<?, ?>) o;
@@ -212,18 +224,21 @@ public class HashMap<K, V> implements Map<K, V> {
         }
 
         @Override
-        public int hashCode() {
+        public int hashCode()
+        {
             return Objects.hash(hash, key, value);
         }
     }
 
     @Override
-    public int size() {
+    public int size()
+    {
         return size;
     }
 
     @Override
-    public boolean isEmpty() {
+    public boolean isEmpty()
+    {
         return size == 0;
     }
 
@@ -235,7 +250,8 @@ public class HashMap<K, V> implements Map<K, V> {
      * @return <tt>true</tt> if this map contains a mapping for the specified key.
      */
     @Override
-    public boolean containsKey(Object key) {
+    public boolean containsKey(Object key)
+    {
         Node<K, V> node = getNode(hash(key), key);
 
         return node != null;
@@ -249,7 +265,8 @@ public class HashMap<K, V> implements Map<K, V> {
      * @return <tt>true</tt> if this map maps one or more keys to the specified value.
      */
     @Override
-    public boolean containsValue(Object value) {
+    public boolean containsValue(Object value)
+    {
         for (Node<K, V> head : buckets) {
             Node<K, V> current = head;
             while (current != null) {
@@ -278,7 +295,8 @@ public class HashMap<K, V> implements Map<K, V> {
      * @see #put(Object, Object)
      */
     @Override
-    public V get(Object key) {
+    public V get(Object key)
+    {
         Node<K, V> node = getNode(hash(key), key);
 
         return node == null ? null : node.value;
@@ -296,7 +314,8 @@ public class HashMap<K, V> implements Map<K, V> {
      * <tt>key</tt>.)
      */
     @Override
-    public V put(K key, V value) {
+    public V put(K key, V value)
+    {
         return putNode(hash(key), key, value, null);
     }
 
@@ -310,7 +329,8 @@ public class HashMap<K, V> implements Map<K, V> {
      * <tt>key</tt>.)
      */
     @Override
-    public V remove(Object key) {
+    public V remove(Object key)
+    {
         Node<K, V> removed = removeNode(hash(key), key);
 
         return removed == null ? null : removed.value;
@@ -323,7 +343,8 @@ public class HashMap<K, V> implements Map<K, V> {
      * @param m mappings to be stored in this map. No entries are added if the provided map is <code>null</code>.
      */
     @Override
-    public void putAll(Map<? extends K, ? extends V> m) {
+    public void putAll(Map<? extends K, ? extends V> m)
+    {
         if (m != null) {
             for (Entry<? extends K, ? extends V> entry : m.entrySet()) {
                 K key = entry.getKey();
@@ -339,7 +360,8 @@ public class HashMap<K, V> implements Map<K, V> {
      * The map will be empty after this call returns.
      */
     @Override
-    public void clear() {
+    public void clear()
+    {
         if (size > 0) {
             for (int x = 0; size > 0 && x < buckets.length; x++) {
                 if (buckets[x] != null) {
@@ -362,7 +384,8 @@ public class HashMap<K, V> implements Map<K, V> {
      * @return a view of the values contained in this map
      */
     @Override
-    public Collection<V> values() {
+    public Collection<V> values()
+    {
         if (cachedValueCollection == null)
             cachedValueCollection = new HashMapValueCollection();
 
@@ -380,7 +403,8 @@ public class HashMap<K, V> implements Map<K, V> {
          * @return The number of elements in this collection.
          */
         @Override
-        public int size() {
+        public int size()
+        {
             return size;
         }
 
@@ -390,7 +414,8 @@ public class HashMap<K, V> implements Map<K, V> {
          * @return <code>true</code> if this collection contains no elements
          */
         @Override
-        public boolean isEmpty() {
+        public boolean isEmpty()
+        {
             return size == 0;
         }
 
@@ -402,7 +427,8 @@ public class HashMap<K, V> implements Map<K, V> {
          * @return <code>true</code> if this collection contains the specified element.
          */
         @Override
-        public boolean contains(Object o) {
+        public boolean contains(Object o)
+        {
             return containsValue(o);
         }
 
@@ -413,7 +439,8 @@ public class HashMap<K, V> implements Map<K, V> {
          * @return an <tt>Iterator</tt> over the elements in this collection.
          */
         @Override
-        public Iterator<V> iterator() {
+        public Iterator<V> iterator()
+        {
             return new HashMapValueIterator();
         }
 
@@ -429,7 +456,8 @@ public class HashMap<K, V> implements Map<K, V> {
              * @return {@code true} if the iteration has more elements.
              */
             @Override
-            public boolean hasNext() {
+            public boolean hasNext()
+            {
                 return super.hasNext();
             }
 
@@ -440,7 +468,8 @@ public class HashMap<K, V> implements Map<K, V> {
              * @throws NoSuchElementException if the iteration has no more elements
              */
             @Override
-            public V next() {
+            public V next()
+            {
                 return super.nextNode().value;
             }
         }
@@ -451,7 +480,8 @@ public class HashMap<K, V> implements Map<K, V> {
          * @return an array containing all of the elements in this collection
          */
         @Override
-        public Object[] toArray() {
+        public Object[] toArray()
+        {
             int index = 0;
             Object[] result = new Object[size];
             for (Node<K, V> current : buckets) {
@@ -481,7 +511,8 @@ public class HashMap<K, V> implements Map<K, V> {
          *                             of every element in this collection
          */
         @Override
-        public <T> T[] toArray(T[] a) {
+        public <T> T[] toArray(T[] a)
+        {
             int size = size();
             T[] r = a.length >= size && a != null ? a : (T[]) java.lang.reflect.Array.newInstance(
                     a.getClass().getComponentType(),
@@ -505,7 +536,8 @@ public class HashMap<K, V> implements Map<K, V> {
          * @throws UnsupportedOperationException
          */
         @Override
-        public boolean add(V v) {
+        public boolean add(V v)
+        {
             throw new UnsupportedOperationException();
         }
 
@@ -517,7 +549,8 @@ public class HashMap<K, V> implements Map<K, V> {
          * @return <tt>true</tt> if an element was removed as a result of this call
          */
         @Override
-        public boolean remove(Object o) {
+        public boolean remove(Object o)
+        {
             for (int x = 0; x < buckets.length; x++) {
                 Node<K, V> current = buckets[x];
                 Node<K, V> previous = null;
@@ -548,7 +581,8 @@ public class HashMap<K, V> implements Map<K, V> {
          * @see #contains(Object)
          */
         @Override
-        public boolean containsAll(Collection<?> c) {
+        public boolean containsAll(Collection<?> c)
+        {
             if (c == null || c.isEmpty())
                 return false;
 
@@ -565,7 +599,8 @@ public class HashMap<K, V> implements Map<K, V> {
          * @throws UnsupportedOperationException
          */
         @Override
-        public boolean addAll(Collection<? extends V> c) {
+        public boolean addAll(Collection<? extends V> c)
+        {
             throw new UnsupportedOperationException();
         }
 
@@ -580,7 +615,8 @@ public class HashMap<K, V> implements Map<K, V> {
          * @see #contains(Object)
          */
         @Override
-        public boolean removeAll(Collection<?> c) {
+        public boolean removeAll(Collection<?> c)
+        {
             if (c == null || c.isEmpty())
                 return false;
 
@@ -618,7 +654,8 @@ public class HashMap<K, V> implements Map<K, V> {
          * @see #contains(Object)
          */
         @Override
-        public boolean retainAll(Collection<?> c) {
+        public boolean retainAll(Collection<?> c)
+        {
             if (c == null || c.isEmpty())
                 return false;
 
@@ -648,7 +685,8 @@ public class HashMap<K, V> implements Map<K, V> {
          * Removes all of the elements from this collection.
          */
         @Override
-        public void clear() {
+        public void clear()
+        {
             HashMap.this.clear();
         }
     }
@@ -660,7 +698,8 @@ public class HashMap<K, V> implements Map<K, V> {
      *
      * @return The current capacity.
      */
-    public int capacity() {
+    public int capacity()
+    {
         return this.buckets.length;
     }
 
@@ -671,7 +710,8 @@ public class HashMap<K, V> implements Map<K, V> {
      *
      * @return The <code>loadFactor</code>.
      */
-    public double getLoadFactor() {
+    public double getLoadFactor()
+    {
         return this.loadFactor;
     }
 
@@ -700,7 +740,8 @@ public class HashMap<K, V> implements Map<K, V> {
         /**
          * Creates a new {@link HashMapIterator}.
          */
-        HashMapIterator() {
+        HashMapIterator()
+        {
             currentBucket = -1;
             nextEntry = getNextHead();
         }
@@ -712,7 +753,8 @@ public class HashMap<K, V> implements Map<K, V> {
          * @return {@code true} if the iteration has more elements
          */
         @Override
-        public boolean hasNext() {
+        public boolean hasNext()
+        {
             return nextEntry != null;
         }
 
@@ -726,7 +768,8 @@ public class HashMap<K, V> implements Map<K, V> {
          *                               method has already been called after the last call to the {@code next} method
          */
         @Override
-        public void remove() {
+        public void remove()
+        {
             if (previous == null)
                 throw new IllegalStateException("Nothing to remove.");
 
@@ -741,7 +784,8 @@ public class HashMap<K, V> implements Map<K, V> {
          * @return the nextNode element in the iteration
          * @throws NoSuchElementException if the iteration has no more elements
          */
-        public Node<K, V> nextNode() {
+        public Node<K, V> nextNode()
+        {
             if (nextEntry == null)
                 throw new NoSuchElementException();
 
@@ -758,7 +802,8 @@ public class HashMap<K, V> implements Map<K, V> {
          *
          * @return Returns the nextNode entry. Returns <code>null</code> if there are no nextNode entries.
          */
-        private Node<K, V> getNextNode(Node<K, V> current) {
+        private Node<K, V> getNextNode(Node<K, V> current)
+        {
             if (current.next == null)
                 return getNextHead();
 
@@ -770,7 +815,8 @@ public class HashMap<K, V> implements Map<K, V> {
          *
          * @return The head of the nextNode bucket. Returns <code>null</code> if there are no more heads.
          */
-        private Node<K, V> getNextHead() {
+        private Node<K, V> getNextHead()
+        {
             for (int x = currentBucket + 1; x < buckets.length; x++) {
                 if (buckets[x] != null) {
                     currentBucket = x;
@@ -793,7 +839,8 @@ public class HashMap<K, V> implements Map<K, V> {
      * @return Whether or not the storage needs an expansion.
      */
 
-    private boolean needsExpansion(Node<K, V>[] storage, int entries) {
+    private boolean needsExpansion(Node<K, V>[] storage, int entries)
+    {
         return entries >= storage.length * loadFactor;
     }
 
@@ -810,7 +857,8 @@ public class HashMap<K, V> implements Map<K, V> {
      *
      * @return The value that was replaced. Returns <code>null</code> if no value was replaced.
      */
-    private V putNode(int hash, K key, V value, Node<K, V> node) {
+    private V putNode(int hash, K key, V value, Node<K, V> node)
+    {
         int bucketIndex = index(hash);
         Node<K, V> head = buckets[bucketIndex];
 
@@ -864,7 +912,8 @@ public class HashMap<K, V> implements Map<K, V> {
      *
      * @return The removed {@link Node}. Returns <code>null</code> if no {@link Node} was removed.
      */
-    private Node<K, V> removeNode(int hash, Object key) {
+    private Node<K, V> removeNode(int hash, Object key)
+    {
         int bucketIndex = index(hash);
         Node<K, V> head = buckets[bucketIndex];
 
@@ -895,7 +944,8 @@ public class HashMap<K, V> implements Map<K, V> {
      *
      * @return The matching {@link Node}. Returns <code>null</code> if no matching {@link Node} could be found.
      */
-    private Node<K, V> getNode(int hash, Object key) {
+    private Node<K, V> getNode(int hash, Object key)
+    {
 
         int bucketIndex = index(hash);
         Node<K, V> current = buckets[bucketIndex];
@@ -917,7 +967,8 @@ public class HashMap<K, V> implements Map<K, V> {
      *
      * @return The matching {@link Node}. Returns <code>null</code> if no matching {@link Node} could be found.
      */
-    private Node<K, V> nodeFromEntry(Object o) {
+    private Node<K, V> nodeFromEntry(Object o)
+    {
         if (!(o instanceof Entry)) {
             return null;
         }
@@ -936,7 +987,8 @@ public class HashMap<K, V> implements Map<K, V> {
      *
      * @return The matching {@link Node}. Returns <code>null</code> if no matching {@link Node} could be found.
      */
-    private Node<K, V> getNode(int hash, Object key, Object value) {
+    private Node<K, V> getNode(int hash, Object key, Object value)
+    {
         int bucketIndex = index(hash);
         Node<K, V> current = buckets[bucketIndex];
 
@@ -959,7 +1011,8 @@ public class HashMap<K, V> implements Map<K, V> {
      *
      * @return The resulting bucket index.
      */
-    private int index(int hash) {
+    private int index(int hash)
+    {
         return Math.abs(hash) % buckets.length;
     }
 
@@ -967,7 +1020,8 @@ public class HashMap<K, V> implements Map<K, V> {
      * Doubles the internal storage of the {@link HashMap}. The entries in the {@link HashMap} are reinserted using a
      * recalculated buckets index.
      */
-    private void expand() {
+    private void expand()
+    {
         Node<K, V>[] before = buckets;
         buckets = (Node<K, V>[]) new Node[buckets.length * 2];
         size = 0;
@@ -989,7 +1043,8 @@ public class HashMap<K, V> implements Map<K, V> {
      *
      * @return The resulting hash.
      */
-    private static int hash(Object key) {
+    private static int hash(Object key)
+    {
         return key == null ? 0 : key.hashCode();
     }
 
@@ -1007,7 +1062,8 @@ public class HashMap<K, V> implements Map<K, V> {
      * @return a set view of the mappings contained in this map
      */
     @Override
-    public Set<Entry<K, V>> entrySet() {
+    public Set<Entry<K, V>> entrySet()
+    {
         if (cachedEntrySet == null)
             cachedEntrySet = new HashMapEntrySet();
 
@@ -1025,7 +1081,8 @@ public class HashMap<K, V> implements Map<K, V> {
          * @return the number of elements in this set.
          */
         @Override
-        public int size() {
+        public int size()
+        {
             return HashMap.this.size();
         }
 
@@ -1035,7 +1092,8 @@ public class HashMap<K, V> implements Map<K, V> {
          * @return <tt>true</tt> if this set contains no elements
          */
         @Override
-        public boolean isEmpty() {
+        public boolean isEmpty()
+        {
             return HashMap.this.size == 0;
         }
 
@@ -1047,7 +1105,8 @@ public class HashMap<K, V> implements Map<K, V> {
          * @return <tt>true</tt> if this set contains the specified element
          */
         @Override
-        public boolean contains(Object o) {
+        public boolean contains(Object o)
+        {
             Node<K, V> found = nodeFromEntry(o);
 
             return found != null;
@@ -1059,13 +1118,15 @@ public class HashMap<K, V> implements Map<K, V> {
          * @return an iterator over the elements in this set
          */
         @Override
-        public Iterator<Entry<K, V>> iterator() {
+        public Iterator<Entry<K, V>> iterator()
+        {
             return new HashMapEntryIterator();
         }
 
         private class HashMapEntryIterator extends HashMapIterator<Entry<K, V>> {
             @Override
-            public Entry<K, V> next() {
+            public Entry<K, V> next()
+            {
                 return nextNode();
             }
         }
@@ -1077,7 +1138,8 @@ public class HashMap<K, V> implements Map<K, V> {
          * @return the array containing all the elements in this set
          */
         @Override
-        public Node<K, V>[] toArray() {
+        public Node<K, V>[] toArray()
+        {
             int nextIndex = 0;
             Node<K, V>[] result = (Node<K, V>[]) new Node[size];
             for (Node<K, V> current : buckets) {
@@ -1121,7 +1183,8 @@ public class HashMap<K, V> implements Map<K, V> {
          *                             of every element in this set
          */
         @Override
-        public <T> T[] toArray(T[] a) {
+        public <T> T[] toArray(T[] a)
+        {
             int size = size();
             T[] r = a.length >= size && a != null ? a : (T[]) java.lang.reflect.Array.newInstance(
                     a.getClass().getComponentType(),
@@ -1149,7 +1212,8 @@ public class HashMap<K, V> implements Map<K, V> {
          * @return <tt>true</tt> if this set did not already contain the specified element
          */
         @Override
-        public boolean add(Entry<K, V> entry) {
+        public boolean add(Entry<K, V> entry)
+        {
             if (entry == null || nodeFromEntry(entry) != null)
                 return false;
 
@@ -1169,7 +1233,8 @@ public class HashMap<K, V> implements Map<K, V> {
          * @return <tt>true</tt> if this set contained the specified element
          */
         @Override
-        public boolean remove(Object o) {
+        public boolean remove(Object o)
+        {
             if (!(o instanceof Entry))
                 return false;
 
@@ -1207,7 +1272,8 @@ public class HashMap<K, V> implements Map<K, V> {
          * @see #contains(Object)
          */
         @Override
-        public boolean containsAll(Collection<?> c) {
+        public boolean containsAll(Collection<?> c)
+        {
             if (c == null || c.isEmpty())
                 return true;
 
@@ -1230,7 +1296,8 @@ public class HashMap<K, V> implements Map<K, V> {
          * @see #add(Object)
          */
         @Override
-        public boolean addAll(Collection<? extends Entry<K, V>> c) {
+        public boolean addAll(Collection<? extends Entry<K, V>> c)
+        {
             boolean changed = false;
             if (c != null) {
                 for (Entry<K, V> entry : c) {
@@ -1256,7 +1323,8 @@ public class HashMap<K, V> implements Map<K, V> {
          * @see #remove(Object)
          */
         @Override
-        public boolean retainAll(Collection<?> c) {
+        public boolean retainAll(Collection<?> c)
+        {
             if (c == null || c.isEmpty()) {
                 clear();
                 return true;
@@ -1297,7 +1365,8 @@ public class HashMap<K, V> implements Map<K, V> {
          * @see #contains(Object)
          */
         @Override
-        public boolean removeAll(Collection<?> c) {
+        public boolean removeAll(Collection<?> c)
+        {
             if (c == null || c.isEmpty()) {
                 return false;
             }
@@ -1316,7 +1385,8 @@ public class HashMap<K, V> implements Map<K, V> {
          * Removes all of the elements from this set. The set will be empty after this call returns.
          */
         @Override
-        public void clear() {
+        public void clear()
+        {
             HashMap.this.clear();
         }
     }
@@ -1333,7 +1403,8 @@ public class HashMap<K, V> implements Map<K, V> {
      * @return a set view of the keys contained in this map
      */
     @Override
-    public Set<K> keySet() {
+    public Set<K> keySet()
+    {
         if (cachedKeySet == null)
             cachedKeySet = new HashMapKeySet();
 
@@ -1350,7 +1421,8 @@ public class HashMap<K, V> implements Map<K, V> {
          * @return the number of elements in this set.
          */
         @Override
-        public int size() {
+        public int size()
+        {
             return HashMap.this.size;
         }
 
@@ -1360,7 +1432,8 @@ public class HashMap<K, V> implements Map<K, V> {
          * @return <tt>true</tt> if this set contains no elements
          */
         @Override
-        public boolean isEmpty() {
+        public boolean isEmpty()
+        {
             return HashMap.this.size == 0;
         }
 
@@ -1372,7 +1445,8 @@ public class HashMap<K, V> implements Map<K, V> {
          * @return <tt>true</tt> if this set contains the specified element
          */
         @Override
-        public boolean contains(Object o) {
+        public boolean contains(Object o)
+        {
             return getNode(hash(o), o) != null;
         }
 
@@ -1382,7 +1456,8 @@ public class HashMap<K, V> implements Map<K, V> {
          * @return an iterator over the elements in this set
          */
         @Override
-        public Iterator<K> iterator() {
+        public Iterator<K> iterator()
+        {
             return new HashMapKeyIterator();
         }
 
@@ -1392,7 +1467,8 @@ public class HashMap<K, V> implements Map<K, V> {
          */
         private final class HashMapKeyIterator extends HashMapIterator<K> {
             @Override
-            public K next() {
+            public K next()
+            {
                 return nextNode().key;
             }
         }
@@ -1404,7 +1480,8 @@ public class HashMap<K, V> implements Map<K, V> {
          * @return an array containing all the elements in this set
          */
         @Override
-        public Object[] toArray() {
+        public Object[] toArray()
+        {
             int nextIndex = 0;
             Object[] result = new Object[size];
             for (Node<K, V> current : buckets) {
@@ -1431,7 +1508,8 @@ public class HashMap<K, V> implements Map<K, V> {
          *                             of every element in this set
          */
         @Override
-        public <T> T[] toArray(T[] a) {
+        public <T> T[] toArray(T[] a)
+        {
             int size = size();
             T[] r = a == null || (a != null && a.length < size) ? (T[]) java.lang.reflect.Array.newInstance(
                     a.getClass().getComponentType(),
@@ -1460,7 +1538,8 @@ public class HashMap<K, V> implements Map<K, V> {
          * @return <tt>true</tt> if this set contained the specified element
          */
         @Override
-        public boolean remove(Object o) {
+        public boolean remove(Object o)
+        {
             return removeNode(hash(o), o) != null;
         }
 
@@ -1475,7 +1554,8 @@ public class HashMap<K, V> implements Map<K, V> {
          * @see #contains(Object)
          */
         @Override
-        public boolean containsAll(Collection<?> c) {
+        public boolean containsAll(Collection<?> c)
+        {
             if (c == null || c.isEmpty()) {
                 return true;
             }
@@ -1500,7 +1580,8 @@ public class HashMap<K, V> implements Map<K, V> {
          * @see #remove(Object)
          */
         @Override
-        public boolean retainAll(Collection<?> c) {
+        public boolean retainAll(Collection<?> c)
+        {
             if (c == null || c.isEmpty()) {
                 clear();
                 return true;
@@ -1540,7 +1621,8 @@ public class HashMap<K, V> implements Map<K, V> {
          * @see #contains(Object)
          */
         @Override
-        public boolean removeAll(Collection<?> c) {
+        public boolean removeAll(Collection<?> c)
+        {
             if (c == null || c.isEmpty()) {
                 return false;
             }
@@ -1559,7 +1641,8 @@ public class HashMap<K, V> implements Map<K, V> {
          * Removes all of the elements from this set. The set will be empty after this call returns.
          */
         @Override
-        public void clear() {
+        public void clear()
+        {
             HashMap.this.clear();
         }
 
@@ -1567,7 +1650,8 @@ public class HashMap<K, V> implements Map<K, V> {
          * Unsupported operation.
          */
         @Override
-        public boolean addAll(Collection<? extends K> c) {
+        public boolean addAll(Collection<? extends K> c)
+        {
             throw new UnsupportedOperationException();
         }
 
@@ -1575,7 +1659,8 @@ public class HashMap<K, V> implements Map<K, V> {
          * Unsupported operation.
          */
         @Override
-        public boolean add(K k) {
+        public boolean add(K k)
+        {
             throw new UnsupportedOperationException();
         }
     }
