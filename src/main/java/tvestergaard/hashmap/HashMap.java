@@ -83,7 +83,6 @@ public class HashMap<K, V> implements Map<K, V>
 	 *
 	 * @param capacity   The number of buckets to create in the {@link HashMap}.
 	 * @param loadFactor The load-factor to use in the {@link HashMap}.
-	 *
 	 * @throws IllegalArgumentException When the provided <code>capacity</code> is less than 2.
 	 * @throws IllegalArgumentException When the provided <code>loadFactor</code> is outside the range <code>0 <
 	 *                                  loadFactor <= 1</code>.
@@ -195,7 +194,6 @@ public class HashMap<K, V> implements Map<K, V>
 		 * Sets the value of the {@link Node}.
 		 *
 		 * @param value The new value of the {@link Node}.
-		 *
 		 * @return The old value.
 		 */
 		public V setValue(V value)
@@ -244,7 +242,6 @@ public class HashMap<K, V> implements Map<K, V>
 	 * Returns <tt>true</tt> if this map contains a mapping for the specified key.
 	 *
 	 * @param key The key whose presence in this map is to be tested.
-	 *
 	 * @return <tt>true</tt> if this map contains a mapping for the specified key.
 	 */
 	@Override public boolean containsKey(Object key)
@@ -258,7 +255,6 @@ public class HashMap<K, V> implements Map<K, V>
 	 * Returns <tt>true</tt> if this map maps one or more keys to the specified value.
 	 *
 	 * @param value The value whose presence in this map is to be tested.
-	 *
 	 * @return <tt>true</tt> if this map maps one or more keys to the specified value.
 	 */
 	@Override public boolean containsValue(Object value)
@@ -303,7 +299,6 @@ public class HashMap<K, V> implements Map<K, V>
 	 *
 	 * @param key   key with which the specified value is to be associated
 	 * @param value value to be associated with the specified key
-	 *
 	 * @return the previous value associated with <tt>key</tt>, or <tt>null</tt> if there was no mapping for
 	 * <tt>key</tt>. (A <tt>null</tt> return can also indicate that the map previously associated <tt>null</tt> with
 	 * <tt>key</tt>.)
@@ -317,7 +312,6 @@ public class HashMap<K, V> implements Map<K, V>
 	 * Removes the mapping for the specified key from this map if present.
 	 *
 	 * @param key key whose mapping is to be removed from the map
-	 *
 	 * @return the previous value associated with <tt>key</tt>, or <tt>null</tt> if there was no mapping for
 	 * <tt>key</tt>. (A <tt>null</tt> return can also indicate that the map previously associated <tt>null</tt> with
 	 * <tt>key</tt>.)
@@ -416,7 +410,6 @@ public class HashMap<K, V> implements Map<K, V>
 		 * Returns <code>true</code> if this collection contains the specified element.
 		 *
 		 * @param o element whose presence in this collection is to be tested.
-		 *
 		 * @return <code>true</code> if this collection contains the specified element.
 		 */
 		@Override public boolean contains(Object o)
@@ -493,10 +486,9 @@ public class HashMap<K, V> implements Map<K, V>
 		 *
 		 * @param a the array into which the elements of this collection are to be stored, if it is big enough;
 		 *          otherwise, a new array of the same runtime type is allocated for this purpose.
-		 *
 		 * @return an array containing all of the elements in this collection
 		 * @throws ArrayStoreException if the runtime type of the specified array is not a supertype of the runtime
-		 * type
+		 *                             type
 		 *                             of every element in this collection
 		 */
 		@Override public <T> T[] toArray(T[] a)
@@ -532,7 +524,6 @@ public class HashMap<K, V> implements Map<K, V>
 		 * Removes a single instance of the specified element from this collection, if it is present.
 		 *
 		 * @param o element to be removed from this collection, if present
-		 *
 		 * @return <tt>true</tt> if an element was removed as a result of this call
 		 */
 		@Override public boolean remove(Object o)
@@ -562,7 +553,6 @@ public class HashMap<K, V> implements Map<K, V>
 		 * Returns <tt>true</tt> if this collection contains all of the elements in the specified collection.
 		 *
 		 * @param c collection to be checked for containment in this collection
-		 *
 		 * @return <tt>true</tt> if this collection contains all of the elements in the specified collection.
 		 * @see #contains(Object)
 		 */
@@ -593,7 +583,6 @@ public class HashMap<K, V> implements Map<K, V>
 		 * call returns, this collection will contain no elements in common with the specified collection.
 		 *
 		 * @param c collection containing elements to be removed from this collection.
-		 *
 		 * @return <tt>true</tt> if this collection changed as a result of the call.
 		 * @see #remove(Object)
 		 * @see #contains(Object)
@@ -631,7 +620,6 @@ public class HashMap<K, V> implements Map<K, V>
 		 * removes from this collection all of its elements that are not contained in the specified collection.
 		 *
 		 * @param c collection containing elements to be retained in this collection
-		 *
 		 * @return <tt>true</tt> if this collection changed as a result of the call
 		 * @see #remove(Object)
 		 * @see #contains(Object)
@@ -779,7 +767,6 @@ public class HashMap<K, V> implements Map<K, V>
 		 * the head of the nextNode bucket.
 		 *
 		 * @param current The last returned entry.
-		 *
 		 * @return Returns the nextNode entry. Returns <code>null</code> if there are no nextNode entries.
 		 */
 		private Node<K, V> getNextNode(Node<K, V> current)
@@ -815,7 +802,6 @@ public class HashMap<K, V> implements Map<K, V>
 	 *
 	 * @param storage The storage.
 	 * @param entries The number of entries to use, when checking whether or not the storage needs to be expanded.
-	 *
 	 * @return Whether or not the storage needs an expansion.
 	 */
 
@@ -834,7 +820,6 @@ public class HashMap<K, V> implements Map<K, V>
 	 * @param node  An existing {@link Node} instance. Can be provided so the method doesn't need to create a new
 	 *              instance. A new instance will only be created if this argument is <code>null</code>. The
 	 *              <code>node.nextNode</code> reference is always removed.
-	 *
 	 * @return The value that was replaced. Returns <code>null</code> if no value was replaced.
 	 */
 	private V putNode(int hash, K key, V value, Node<K, V> node)
@@ -889,7 +874,6 @@ public class HashMap<K, V> implements Map<K, V>
 	 *
 	 * @param hash The <code>hash</code> of the {@link Node} to remove.
 	 * @param key  The <code>key</code> of the {@link Node} to remove.
-	 *
 	 * @return The removed {@link Node}. Returns <code>null</code> if no {@link Node} was removed.
 	 */
 	private Node<K, V> removeNode(int hash, Object key)
@@ -921,7 +905,6 @@ public class HashMap<K, V> implements Map<K, V>
 	 *
 	 * @param hash The hash the {@link Node} must match.
 	 * @param key  The key the {@link Node} must match.
-	 *
 	 * @return The matching {@link Node}. Returns <code>null</code> if no matching {@link Node} could be found.
 	 */
 	private Node<K, V> getNode(int hash, Object key)
@@ -944,7 +927,6 @@ public class HashMap<K, V> implements Map<K, V>
 	 * Gets the {@link Node} matching the key and value from the provided Map.Entry.
 	 *
 	 * @param o The Map.Entry that the target {@link Node} must match.
-	 *
 	 * @return The matching {@link Node}. Returns <code>null</code> if no matching {@link Node} could be found.
 	 */
 	private Node<K, V> nodeFromEntry(Object o)
@@ -964,7 +946,6 @@ public class HashMap<K, V> implements Map<K, V>
 	 * @param hash  The hash that the target {@link Node} must match.
 	 * @param key   The key that the target {@link Node} must match.
 	 * @param value The value that the target {@link Node} must match.
-	 *
 	 * @return The matching {@link Node}. Returns <code>null</code> if no matching {@link Node} could be found.
 	 */
 	private Node<K, V> getNode(int hash, Object key, Object value)
@@ -988,7 +969,6 @@ public class HashMap<K, V> implements Map<K, V>
 	 * Calculates the bucket index from the provided <code>hash</code>.
 	 *
 	 * @param hash The hash that the bucket index should be calculated from.
-	 *
 	 * @return The resulting bucket index.
 	 */
 	private int index(int hash)
@@ -1020,7 +1000,6 @@ public class HashMap<K, V> implements Map<K, V>
 	 * Hashes the provided key.
 	 *
 	 * @param key The key to hash.
-	 *
 	 * @return The resulting hash.
 	 */
 	private static int hash(Object key)
@@ -1079,7 +1058,6 @@ public class HashMap<K, V> implements Map<K, V>
 		 * Returns <tt>true</tt> if this set contains the specified element.
 		 *
 		 * @param o element whose presence in this set is to be tested
-		 *
 		 * @return <tt>true</tt> if this set contains the specified element
 		 */
 		@Override public boolean contains(Object o)
@@ -1151,10 +1129,9 @@ public class HashMap<K, V> implements Map<K, V>
 		 *
 		 * @param a the array into which the elements of this set are to be stored, if it is big enough; otherwise, a
 		 *          new array of the same runtime type is allocated for this purpose.
-		 *
 		 * @return an array containing all the elements in this set
 		 * @throws ArrayStoreException if the runtime type of the specified array is not a supertype of the runtime
-		 * type
+		 *                             type
 		 *                             of every element in this set
 		 */
 		@Override public <T> T[] toArray(T[] a)
@@ -1182,7 +1159,6 @@ public class HashMap<K, V> implements Map<K, V>
 		 * cannot be allowed.
 		 *
 		 * @param entry element to be added to this set
-		 *
 		 * @return <tt>true</tt> if this set did not already contain the specified element
 		 */
 		@Override public boolean add(Entry<K, V> entry)
@@ -1202,7 +1178,6 @@ public class HashMap<K, V> implements Map<K, V>
 		 * call).
 		 *
 		 * @param o object to be removed from this set, if present
-		 *
 		 * @return <tt>true</tt> if this set contained the specified element
 		 */
 		@Override public boolean remove(Object o)
@@ -1239,24 +1214,17 @@ public class HashMap<K, V> implements Map<K, V>
 		 * collection is also a set, this method returns <tt>true</tt> if it is a <i>subset</i> of this set.
 		 *
 		 * @param c collection to be checked for containment in this set
-		 *
 		 * @return <tt>true</tt> if this set contains all of the elements of the specified collection
 		 * @see #contains(Object)
 		 */
 		@Override public boolean containsAll(Collection<?> c)
 		{
-			if (c != null) {
-				for (int x = 0; x < buckets.length; x++) {
-					Node<K, V> current = buckets[x];
-					while (current != null) {
-						if (!c.contains(current)) {
-							return false;
-						}
+			if (c == null || c.isEmpty())
+				return true;
 
-						current = current.next;
-					}
-				}
-			}
+			for (Object o : c)
+				if (!contains(o))
+					return false;
 
 			return true;
 		}
@@ -1268,7 +1236,6 @@ public class HashMap<K, V> implements Map<K, V>
 		 * collection is modified while the operation is in progress.
 		 *
 		 * @param c collection containing elements to be added to this set
-		 *
 		 * @return <tt>true</tt> if this set changed as a result of the call
 		 * @see #add(Object)
 		 */
@@ -1294,7 +1261,6 @@ public class HashMap<K, V> implements Map<K, V>
 		 * <i>intersection</i> of the two sets.
 		 *
 		 * @param c collection containing elements to be retained in this set
-		 *
 		 * @return <tt>true</tt> if this set changed as a result of the call
 		 * @see #remove(Object)
 		 */
@@ -1334,7 +1300,6 @@ public class HashMap<K, V> implements Map<K, V>
 		 * set difference</i> of the two sets.
 		 *
 		 * @param c collection containing elements to be removed from this set
-		 *
 		 * @return <tt>true</tt> if this set changed as a result of the call
 		 * @see #remove(Object)
 		 * @see #contains(Object)
@@ -1412,7 +1377,6 @@ public class HashMap<K, V> implements Map<K, V>
 		 * Returns <tt>true</tt> if this set contains the specified element.
 		 *
 		 * @param o element whose presence in this set is to be tested
-		 *
 		 * @return <tt>true</tt> if this set contains the specified element
 		 */
 		@Override public boolean contains(Object o)
@@ -1469,10 +1433,9 @@ public class HashMap<K, V> implements Map<K, V>
 		 *
 		 * @param a the array into which the elements of this set are to be stored, if it is big enough; otherwise, a
 		 *          new array of the same runtime type is allocated for this purpose.
-		 *
 		 * @return an array containing all the elements in this set
 		 * @throws ArrayStoreException if the runtime type of the specified array is not a supertype of the runtime
-		 * type
+		 *                             type
 		 *                             of every element in this set
 		 */
 		@Override public <T> T[] toArray(T[] a)
@@ -1501,7 +1464,6 @@ public class HashMap<K, V> implements Map<K, V>
 		 * call).  (This set will not contain the element once the call returns.)
 		 *
 		 * @param o object to be removed from this set, if present
-		 *
 		 * @return <tt>true</tt> if this set contained the specified element
 		 */
 		@Override public boolean remove(Object o)
@@ -1515,7 +1477,6 @@ public class HashMap<K, V> implements Map<K, V>
 		 * collection is also a set, this method returns <tt>true</tt> if it is a <i>subset</i> of this set.
 		 *
 		 * @param c collection to be checked for containment in this set
-		 *
 		 * @return <tt>true</tt> if this set contains all of the elements of the specified collection
 		 * @see #contains(Object)
 		 */
@@ -1525,16 +1486,9 @@ public class HashMap<K, V> implements Map<K, V>
 				return true;
 			}
 
-			for (Node<K, V> bucket : buckets) {
-				Node<K, V> current = bucket;
-				while (current != null) {
-					if (!c.contains(current.key)) {
-						return false;
-					}
-
-					current = current.next;
-				}
-			}
+			for (Object o : c)
+				if (!contains(o))
+					return false;
 
 			return true;
 		}
@@ -1547,7 +1501,6 @@ public class HashMap<K, V> implements Map<K, V>
 		 * <i>intersection</i> of the two sets.
 		 *
 		 * @param c collection containing elements to be retained in this set
-		 *
 		 * @return <tt>true</tt> if this set changed as a result of the call
 		 * @see #remove(Object)
 		 */
@@ -1586,7 +1539,6 @@ public class HashMap<K, V> implements Map<K, V>
 		 * its value is the <i>asymmetric set difference</i> of the two sets.
 		 *
 		 * @param c collection containing elements to be removed from this set
-		 *
 		 * @return <tt>true</tt> if this set changed as a result of the call
 		 * @see #remove(Object)
 		 * @see #contains(Object)
